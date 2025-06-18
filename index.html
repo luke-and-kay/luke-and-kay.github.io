@@ -1,1 +1,59 @@
-index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Our Wedding</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Luke & Kay</h1>
+    <nav>
+      <a href="#story">Our Story</a>
+      <a href="#details">Wedding Details</a>
+      <a href="#rsvp">RSVP</a>
+    </nav>
+  </header>
+
+  <section id="hero">
+    <h2>We're Getting Married!</h2>
+    <p>Join us in celebrating our love.</p>
+  </section>
+
+  <section id="story">
+    <h2>Our Story</h2>
+    <p>We met in college, bonded over late-night coffee runs, and the rest is history. Liam proposed during a sunrise hike in the mountains, and now we're here!</p>
+  </section>
+
+  <section id="details">
+    <h2>Wedding Details</h2>
+    <p><strong>Date:</strong> October 12, 2025</p>
+    <p><strong>Time:</strong> 4:00 PM</p>
+    <p><strong>Venue:</strong> Rose Garden Estate, Napa Valley, CA</p>
+  </section>
+
+  <section id="rsvp">
+    <h2>RSVP</h2>
+    <form>
+      <label for="name">Your Name</label>
+      <input type="text" id="name" name="name" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+
+      <label for="attending">Will you be attending?</label>
+      <select id="attending" name="attending">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+
+      <button type="submit">Submit</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Emma & Liam</p>
+  </footer>
+</body>
+</html>
