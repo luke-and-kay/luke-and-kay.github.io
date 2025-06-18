@@ -24,6 +24,19 @@ header h1 {
   color: #8b5e3c;
 }
 
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.logo {
+  width: 50px; /* Adjust size as needed */
+  height: auto;
+  border-radius: 50%; /* Optional: makes it circular */
+}
+
 nav {
   margin-top: 0.5rem;
 }
