@@ -7,22 +7,47 @@
 
 body {
   font-family: 'Segoe UI', sans-serif;
-  background-color: #fffaf7;
   color: #333;
   line-height: 1.6;
 }
 
-header {
-  background: #f2e8dc;
-  padding: 1rem;
-  text-align: center;
-  border-bottom: 2px solid #d4c2b0;
-}
+.hero-header {
+    background-image: url('assets/background-4.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover; /* ensures image is shown at native aspect ratio */
+    aspect-ratio: 5/3;
+    justify-content: center;
+    align-items: center;
+    /* position: relative; */
+  }
+  
+  
+  .couple-names {
+    font-family: 'Bellefair', serif;
+    /* position: absolute; */
+    /* top: 50%;
+    left: 50%; */
+    /* transform: translate(-50%, -50%); Perfect center */
+    text-align: center;
+    color: #000;
+    font-size: 2em;
+    background-color: red;
+    height: 20%;
+    /* bottom: 0; */
+  }
+  
 
-header h1 {
-  font-size: 2rem;
-  color: #8b5e3c;
-}
+  .couple-names-and {
+    font-size: 0.5em;
+  }
+  
+  .hero-header nav a {
+    margin: 0 1rem;
+    color: #8b5e3c;
+    text-decoration: none;
+    font-weight: bold;
+  }
 
 .header-container {
   display: flex;
@@ -32,9 +57,11 @@ header h1 {
 }
 
 .logo {
-  width: 50px; /* Adjust size as needed */
-  height: auto;
-  border-radius: 50%; /* Optional: makes it circular */
+  position: absolute;
+  width: auto;
+  height: 200px;
+  top: 0;
+  left: 0;
 }
 
 nav {

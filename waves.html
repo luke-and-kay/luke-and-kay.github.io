@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boat on Animated Wave</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bellefair&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      height: 2000px;
+      /* background: #ff99cc; */
+      justify-content: center;
+      /* align-items: center; */
+      display: flex;
+    }
+
+    .background {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(0deg, orange, 10%, #e878a6);
+        z-index: -100;
+    }
+
+    .wave-container {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+    }
+
+
+    .wave-back-svg {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+    }
+
+    .wave-front-svg {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: calc(100% - 50px);
+      display: block;
+      z-index: 30;
+      opacity: 0.7;
+    }
+
+    .boat {
+      position: absolute;
+      max-width: 50%;
+      height: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: rockBoat 30s ease-in-out infinite;
+      z-index: 2;
+    }
+
+    @keyframes rockBoat {
+      0%, 100% { transform: translateX(-90%) rotate(-1.5deg); }
+      50% { transform: translateX(-10%) rotate(1.5deg); }
+    }
+
+    .save-the-date-container {
+        max-width: 80%;
+        height: calc(100vh - 180px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .announcement-subtext {
+        margin: 0;
+        padding: 0;
+        font-family: 'Bellefair', serif;
+        color: white;
+        opacity: 0.7;
+        font-size: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .announcement-text {
+        margin: 0;
+        padding: 0;
+        font-family: 'Old Standard TT', serif;
+        font-weight: 700;
+        color: white;
+        font-size: 3rem;
+        margin: 0.5rem 0;
+
+    }
+
+    .announcement-ampersand {
+        margin: 0;
+        padding: 0;
+        font-family: 'Old Standard TT', serif;
+        font-weight: 700;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .date-container {
+        margin: 3rem 0;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: 'Bellefair', serif;
+    }
+
+    .date-subcontainer {
+        display: flex;
+        flex-direction: row;
+        
+        justify-content: center;
+        align-items: center;
+    }
+
+    .bordered-date {
+        border-top: 3px solid white;
+        border-bottom: 3px solid white;
+        color: white;
+        padding: 0.5rem 0;
+        width: 4.5rem;
+        justify-content: center;
+        text-align: center;
+        font-size: 1.4rem;
+        margin: 0 1.5rem;
+    }
+
+    .date-day {
+        color: white;
+        font-size: 3rem;
+    }
+
+    .date-year {
+        color: white;
+        /* font-weight: 700; */
+        font-size: 1.2rem;
+        margin-top: 0.5rem;
+    }
+
+    .location {
+        color: white;
+        font-family: 'Old Standard TT', serif;
+        font-weight: 700;
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+    }
+
+    .details-container {
+        width: 80%;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        text-wrap: balance;
+        font-family: 'Bellefair', serif;
+        color: white;
+        font-size: 1.4rem;
+    }
+
+    .details-1 {
+        margin-bottom: 1rem;
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <div class="background"></div>
+
+  <div class="wave-container">
+
+    <svg class="wave-back-svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path id="waveBackPath" fill="#054D6A" d="M0,160 C360,240 1080,80 1440,160 L1440,320 L0,320 Z" />
+    </svg>
+
+    <img src="assets/boat.svg" alt="Boat" class="boat" />
+
+    <svg class="wave-front-svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+        <path id="waveFrontPath" fill="#0B5775" d="M0,160 C360,240 1080,80 1440,160 L1440,320 L0,320 Z" />
+      </svg>
+    
+  </div>
+
+
+  <div class="save-the-date-container">
+    <p class="announcement-subtext">SAVE THE DATE</p>
+    <div class="announcement-text">KAYLEIGH</div>
+    <div class="announcement-ampersand">&</div>
+    <div class="announcement-text">LUKE</div>
+    <div class="announcement-subtext">ARE GETTING MARRIED!</div>
+    <div class="date-container">
+        <div class="date-subcontainer">
+            <div class="bordered-date">SAT</div>
+            <div class="date-day">20</div>
+            <div class="bordered-date">JUNE</div>
+        </div>
+        <div class="date-year">2026</div>
+        
+    </div>
+    <div class="location">BRISTOL, UK</div>
+    <div class="details-container">
+        <div class="details-1">Formal invitation to follow</div>
+        <div class="details-2">We hope you're able to celebrate with us, but if you already know you're unavailable, please let Kayleigh or Luke know</div>
+        
+    </div>
+  </div>
+
+  <script>
+    const backPath = document.getElementById('waveBackPath');
+    const frontPath = document.getElementById('waveFrontPath');
+    const boat = document.querySelector('.boat');
+    let t = 0;
+
+    function animateBackWave() {
+        t += 0.012;
+        const amplitude = 10;
+        const waveLength = 360;
+        let d = "M0,160 ";
+        const width = 1440;
+
+        for (let x = 0; x <= width; x += 60) {
+            const y = 180 + Math.sin((x / waveLength) + t) * amplitude;
+            d += `L${x},${y} `;
+        }
+
+        d += "L1440,320 L0,320 Z";
+        backPath.setAttribute("d", d);
+
+        // Move boat vertically to match wave at center X
+        const boatX = window.innerWidth / 2;
+        const relativeX = boatX * (1440 / window.innerWidth); // scale to SVG width
+
+        const boatY = 140 + Math.sin((relativeX / waveLength) + t) * amplitude;
+
+        const svgViewBoxHeight = 320; // from <svg viewBox="0 0 1440 320">
+        const container = document.querySelector('.wave-container');
+        const containerHeight = container.offsetHeight;
+
+        const scaledY = (boatY / svgViewBoxHeight) * containerHeight;
+        const boatHeight = boat.offsetHeight;
+
+        const newBottom = containerHeight - scaledY - (boatHeight / 2);
+        boat.style.bottom = `${newBottom}px`;
+
+        requestAnimationFrame(animateBackWave);
+    }
+
+    function animateFrontWave() {
+        t += 0.01;
+        const amplitude = 10;
+        const waveLength = 440;
+        let d = "M0,160 ";
+        const width = 1440;
+        const offset = 60;
+
+        for (let x = 0; x <= width; x += 60) {
+            let y = 190 + Math.sin((x / waveLength) + t + offset) * amplitude;
+            y += Math.sin((x / 80) + t) * 10;
+            d += `L${x},${y} `;
+        }
+
+        d += "L1440,320 L0,320 Z";
+        frontPath.setAttribute("d", d);
+
+        requestAnimationFrame(animateFrontWave);
+    }
+
+    animateBackWave();
+    animateFrontWave();
+  </script>
+
+</body>
+</html>
