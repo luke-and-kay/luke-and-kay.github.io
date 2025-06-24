@@ -61,13 +61,18 @@
       height: 8.5vh;
       left: 50%;
       transform: translateX(-50%);
-      animation: rockBoat 30s ease-in-out infinite;
+      /* animation: rockBoat 30s ease-in-out infinite; */
+      animation-name: rockBoat;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-duration: var(--animation-duration);
+      /* animation-duration: 30s; */
       z-index: 2;
     }
 
     @keyframes rockBoat {
-      0%, 100% { transform: translateX(-90%) rotate(-1.5deg); }
-      50% { transform: translateX(-10%) rotate(1.5deg); }
+      0%, 100% { transform: translateX(calc(-50% - 10vw)) rotate(-1.5deg); }
+      50% { transform: translateX(calc(-50% + 10vw)) rotate(1.5deg); }
     }
 
     .save-the-date-container {
@@ -223,9 +228,19 @@
   </div>
 
   <script>
+    const element = document.querySelector('.animate');
+    const vw = window.innerWidth;
+
+    const duration = vw * 25;
+
+
     const backPath = document.getElementById('waveBackPath');
     const frontPath = document.getElementById('waveFrontPath');
     const boat = document.querySelector('.boat');
+
+    boat.style.setProperty('--animation-duration', `${duration}ms`);
+
+
     let t = 0;
 
     function animateBackWave() {
