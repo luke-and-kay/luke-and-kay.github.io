@@ -31,7 +31,7 @@
       position: fixed;
       bottom: 0;
       width: 100%;
-      height: 180px;
+      height: 15vh;
       overflow: hidden;
     }
 
@@ -49,7 +49,7 @@
       position: absolute;
       bottom: 0;
       width: 100%;
-      height: calc(100% - 50px);
+      height: 9vh;
       display: block;
       z-index: 30;
       opacity: 0.7;
@@ -58,7 +58,7 @@
     .boat {
       position: absolute;
       /* max-width: 50%; */
-      height: 90px;
+      height: 8.5vh;
       left: 50%;
       transform: translateX(-50%);
       animation: rockBoat 30s ease-in-out infinite;
@@ -72,11 +72,9 @@
 
     .save-the-date-container {
         max-width: 80%;
-        /* position: absolute;
-        top: 0; */
-        /* background-color: red; */
-        padding: 3rem 0;
-        height: calc(100vh - 180px);
+        background-color: red;
+        padding: 3vh 0;
+        height: 85vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -89,8 +87,8 @@
         font-family: 'Bellefair', serif;
         color: white;
         opacity: 0.7;
-        font-size: 1.5rem;
-        margin: 1rem 0;
+        font-size: 2.5vh;
+        margin: 0.7vh 0;
     }
 
     .announcement-text {
@@ -99,8 +97,8 @@
         font-family: 'Old Standard TT', serif;
         font-weight: 700;
         color: white;
-        font-size: 3rem;
-        margin: 0.1rem 0;
+        font-size: 5vh;
+        margin: 0.05vh 0;
 
     }
 
@@ -110,11 +108,11 @@
         font-family: 'Old Standard TT', serif;
         font-weight: 700;
         color: white;
-        font-size: 1.5rem;
+        font-size: 2.4vh;
     }
 
     .date-container {
-        margin: 2rem 0;
+        margin: 3vh 0;
         justify-content: center;
         display: flex;
         flex-direction: column;
@@ -134,17 +132,17 @@
         border-top: 3px solid white;
         border-bottom: 3px solid white;
         color: white;
-        padding: 0.5rem 0;
+        padding: 0.5vh 0;
         width: 4.5rem;
         justify-content: center;
         text-align: center;
-        font-size: 1.4rem;
+        font-size: 2vh;
         margin: 0 1.5rem;
     }
 
     .date-day {
         color: white;
-        font-size: 3rem;
+        font-size: 5vh;
     }
 
     .date-year {
@@ -158,8 +156,8 @@
         color: white;
         font-family: 'Old Standard TT', serif;
         font-weight: 700;
-        font-size: 1.3rem;
-        margin-bottom: 2rem;
+        font-size: 2vh;
+        margin-bottom: 3vh;
     }
 
     .details-container {
@@ -172,11 +170,11 @@
         text-wrap: balance;
         font-family: 'Bellefair', serif;
         color: white;
-        font-size: 1.4rem;
+        font-size: 2vh;
     }
 
     .details-1 {
-        margin-bottom: 1rem;
+        margin-bottom: 1.7vh;
     }
 
 
@@ -273,7 +271,7 @@
         const offset = 60;
 
         for (let x = 0; x <= width; x += 60) {
-            let y = 190 + Math.sin((x / waveLength) + t + offset) * amplitude;
+            let y = 184 + Math.sin((x / waveLength) + t + offset) * amplitude;
             y += Math.sin((x / 80) + t) * 10;
             d += `L${x},${y} `;
         }
