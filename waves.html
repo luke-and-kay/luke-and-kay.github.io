@@ -63,16 +63,23 @@
       transform: translateX(-50%);
       /* animation: rockBoat 30s ease-in-out infinite; */
       animation-name: rockBoat;
-      animation-timing-function: ease-in-out;
+      animation-timing-function: linear;
       animation-iteration-count: infinite;
       animation-duration: var(--animation-duration);
       /* animation-duration: 30s; */
       z-index: 2;
     }
 
-    @keyframes rockBoat {
+    /* @keyframes rockBoat {
       0%, 100% { transform: translateX(calc(-50% - 10vw)) rotate(-1.5deg); }
       50% { transform: translateX(calc(-50% + 10vw)) rotate(1.5deg); }
+    } */
+
+    @keyframes rockBoat {
+      0%, 100% { transform: translateX(-50%); }
+      25% { transform: translateX(calc(-50% + 10vw)) rotate(1deg); }
+      50% { transform: translateX(-50%) rotate(-1deg); }
+      75% { transform: translateX(calc(-50% - 10vw)) rotate(1deg); }
     }
 
     .save-the-date-container {
@@ -231,7 +238,7 @@
     const element = document.querySelector('.animate');
     const vw = window.innerWidth;
 
-    const duration = Math.pow(vw, 2) * 0.05;
+    const duration = Math.pow(vw, 2) * 0.2;
 
 
     const backPath = document.getElementById('waveBackPath');
