@@ -231,7 +231,7 @@
     const element = document.querySelector('.animate');
     const vw = window.innerWidth;
 
-    const duration = vw * 25;
+    const duration = Math.pow(vw, 2) * 0.05;
 
 
     const backPath = document.getElementById('waveBackPath');
@@ -244,18 +244,18 @@
     let t = 0;
 
     function animateBackWave() {
-        t += 0.012;
-        const amplitude = 10;
-        const waveLength = 360;
+        t += 0.01;
+        const amplitude = 8;
+        const waveLength = Math.max(0.06 * window.innerWidth, 360);
         let d = "M0,160 ";
         const width = 1440;
 
-        for (let x = 0; x <= width; x += 60) {
+        for (let x = 0; x <= width; x += 6) {
             const y = 180 + Math.sin((x / waveLength) + t) * amplitude;
             d += `L${x},${y} `;
         }
 
-        d += "L1440,320 L0,320 Z";
+        d += `L1440,320 L0,320 Z`;
         backPath.setAttribute("d", d);
 
         // Move boat vertically to match wave at center X
@@ -279,15 +279,14 @@
 
     function animateFrontWave() {
         t += 0.01;
-        const amplitude = 10;
-        const waveLength = 440;
+        const amplitude = 20;
+        const waveLength = 0.2 * window.innerWidth;
         let d = "M0,160 ";
         const width = 1440;
         const offset = 60;
 
-        for (let x = 0; x <= width; x += 60) {
+        for (let x = 0; x <= width; x += 6) {
             let y = 184 + Math.sin((x / waveLength) + t + offset) * amplitude;
-            y += Math.sin((x / 80) + t) * 10;
             d += `L${x},${y} `;
         }
 
