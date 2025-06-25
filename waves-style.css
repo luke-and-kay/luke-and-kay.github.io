@@ -30,7 +30,7 @@ body {
     z-index: 1;
 }
 
-    .wave-front-svg {
+.wave-front-svg {
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -38,133 +38,141 @@ body {
     display: block;
     z-index: 30;
     opacity: 0.7;
-    }
+}
 
-    .boat {
+.boat {
     position: absolute;
-    /* max-width: 50%; */
     height: 8.5vh;
     left: 50%;
     bottom: 6vh;
     transform: translateX(-50%);
     z-index: 2;
-    }
+}
 
-    /* @keyframes rockBoat {
-    0%, 100% { transform: translateX(calc(-50% - 10vw)) rotate(-1.5deg); }
-    50% { transform: translateX(calc(-50% + 10vw)) rotate(1.5deg); }
-    } */
+.save-the-date-container {
+    max-width: 80%;
+    padding: 3vh 0;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
-    /* @keyframes rockBoat {
-    0%, 100% { transform: translateX(-50%); }
-    25% { transform: translateX(calc(-50% + 10vw)) rotate(1deg); }
-    50% { transform: translateX(-50%) rotate(-1deg); }
-    75% { transform: translateX(calc(-50% - 10vw)) rotate(1deg); }
-    } */
+.announcement-subtext {
+    margin: 0;
+    padding: 0;
+    font-family: 'Bellefair', serif;
+    color: white;
+    opacity: 0.7;
+    font-size: 2.5vh;
+    margin: 0.7vh 0;
+}
 
-    .save-the-date-container {
-        max-width: 80%;
-        /* background-color: red; */
-        padding: 3vh 0;
-        height: 80vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
+.announcement-text {
+    margin: 0;
+    padding: 0;
+    font-family: 'Old Standard TT', serif;
+    font-weight: 700;
+    color: white;
+    font-size: 5vh;
+    margin: 0.05vh 0;
+}
 
-    .announcement-subtext {
-        margin: 0;
-        padding: 0;
-        font-family: 'Bellefair', serif;
-        color: white;
-        opacity: 0.7;
-        font-size: 2.5vh;
-        margin: 0.7vh 0;
-    }
+.announcement-ampersand {
+    margin: 0;
+    padding: 0;
+    font-family: 'Old Standard TT', serif;
+    font-weight: 700;
+    color: white;
+    font-size: 2.4vh;
+}
 
-    .announcement-text {
-        margin: 0;
-        padding: 0;
-        font-family: 'Old Standard TT', serif;
-        font-weight: 700;
-        color: white;
-        font-size: 5vh;
-        margin: 0.05vh 0;
+.date-container {
+    margin: 3vh 0;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Bellefair', serif;
+}
 
-    }
+.date-subcontainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
 
-    .announcement-ampersand {
-        margin: 0;
-        padding: 0;
-        font-family: 'Old Standard TT', serif;
-        font-weight: 700;
-        color: white;
-        font-size: 2.4vh;
-    }
+.bordered-date {
+    border-top: 3px solid white;
+    border-bottom: 3px solid white;
+    color: white;
+    padding: 0.5vh 0;
+    width: 4.5rem;
+    justify-content: center;
+    text-align: center;
+    font-size: 2vh;
+    margin: 0 1.5rem;
+}
 
-    .date-container {
-        margin: 3vh 0;
-        justify-content: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-family: 'Bellefair', serif;
-    }
+.date-day {
+    color: white;
+    font-size: 5vh;
+}
 
-    .date-subcontainer {
-        display: flex;
-        flex-direction: row;
-        
-        justify-content: center;
-        align-items: center;
-    }
+.date-year {
+    color: white;
+    font-size: 2vh;
+    margin-top: 0.6vh;
+}
 
-    .bordered-date {
-        border-top: 3px solid white;
-        border-bottom: 3px solid white;
-        color: white;
-        padding: 0.5vh 0;
-        width: 4.5rem;
-        justify-content: center;
-        text-align: center;
-        font-size: 2vh;
-        margin: 0 1.5rem;
-    }
+.location {
+    color: white;
+    font-family: 'Old Standard TT', serif;
+    font-weight: 700;
+    font-size: 2vh;
+    margin-bottom: 3vh;
+}
 
-    .date-day {
-        color: white;
-        font-size: 5vh;
-    }
+.details-container {
+    width: 80%;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-wrap: balance;
+    font-family: 'Bellefair', serif;
+    color: white;
+    font-size: 2vh;
+}
 
-    .date-year {
-        color: white;
-        /* font-weight: 700; */
-        font-size: 2vh;
-        margin-top: 0.6vh;
-    }
+.details-1 {
+    margin-bottom: 1.7vh;
+}
 
-    .location {
-        color: white;
-        font-family: 'Old Standard TT', serif;
-        font-weight: 700;
-        font-size: 2vh;
-        margin-bottom: 3vh;
-    }
+.bird-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
 
-    .details-container {
-        width: 80%;
-        justify-content: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        text-wrap: balance;
-        font-family: 'Bellefair', serif;
-        color: white;
-        font-size: 2vh;
-    }
+.bird-container img {
+    width: 20px;
+    height: auto;
+}
 
-    .details-1 {
-        margin-bottom: 1.7vh;
-    }
+.animation-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.animation-container img {
+    width: 20px;
+    height: auto;
+    transform: rotate(15deg);
+}

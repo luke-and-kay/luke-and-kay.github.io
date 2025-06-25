@@ -14,6 +14,7 @@
 </head>
 <body>
     <div class="background"></div>
+
     <div class="wave-container">
         <svg
             class="wave-back-svg" 
@@ -62,6 +63,20 @@
                 know you're unavailable, please let Kayleigh or Luke know
             </div>
         </div>
+    </div>
+
+    <!-- <div class="bird-container" id="bird-container">
+        <img class="frame" src="assets/bird-frame-1.svg" style="display:none;">
+        <img class="frame" src="assets/bird-frame-2.svg" style="display:none;">
+        <img class="frame" src="assets/bird-frame-3.svg" style="display:none;">
+        <img class="frame" src="assets/bird-frame-2.svg" style="display:none;">
+    </div> -->
+
+    <div class="animation-container" id="animation-container">
+        <img class="frame" src="assets/bird-frame-1.svg" style="display:none;">
+        <img class="frame" src="assets/bird-frame-2.svg" style="display:none;">
+        <img class="frame" src="assets/bird-frame-3.svg" style="display:none;">
+        <img class="frame" src="assets/bird-frame-2.svg" style="display:none;">
     </div>
 
     <script>
@@ -134,116 +149,168 @@
 
         requestAnimationFrame(oscillate);
 
-        function spawnBird() {
-            const bird = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            bird.setAttribute("class", "bird");
-            bird.setAttribute("width", "30");
-            bird.setAttribute("height", "30");
-            bird.innerHTML = `<use href="#bird" />`;
 
-            bird.style.position = "absolute";
-            bird.style.top = `${Math.random() * 60 + 10}%`; // upper 80% of screen
-            bird.style.left = "-50px";
-            bird.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
 
-            document.body.appendChild(bird);
+        const glideProportion = 0.8;
+        const frames = document.querySelectorAll('.frame');
+  const totalFrames = frames.length;
+  let frameIndex = 0;
+  let animationInterval;
 
-            const duration = Math.random() * 10 + 10; // 10–20s
-            bird.animate(
-                [
-                { transform: bird.style.transform + " translateX(0)" },
-                { transform: bird.style.transform + " translateX(110vw)" }
-                ],
-                {
-                duration: duration * 1000,
-                easing: "linear",
-                fill: "forwards"
-                }
-            );
+  function showNextFrame() {
+    frames.forEach((f, i) => f.style.display = 'none');
+    frames[frameIndex].style.display = 'block';
+    if (frameIndex === 0) {
+        frameIndex = Math.random() < glideProportion ? 0 : 1;
+    } else {
+        frameIndex = (frameIndex + 1) % totalFrames;
+    };
+  }
 
-            setTimeout(() => bird.remove(), duration * 1000);
-        }
+  function startFrameAnimation() {
+    if (animationInterval) clearInterval(animationInterval);
+    animationInterval = setInterval(showNextFrame, 100); // 10 FPS
+  }
 
-        setInterval(spawnBird, 5000); // One bird every 5s
+  function moveAcrossScreen() {
+    const container = document.getElementById('animation-container');
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    // Random direction and top position
+    const direction = Math.random() < 0.5 ? 'left-to-right' : 'right-to-left';
+    const topPosition = Math.random() * (screenHeight / 8);
+
+    if (direction === 'right-to-left') {
+        container.style.transform = 'scaleX(-1)';
+    } else {
+        container.style.transform = 'scaleX(1)';
+    }
+
+    // Initial and final positions
+    const startLeft = direction === 'left-to-right' ? -120 : screenWidth + 120;
+    const endLeft = direction === 'left-to-right' ? screenWidth + 120 : -120;
+
+    const startTop = Math.random() * (screenHeight / 2);
+    const endTop = Math.random() * (screenHeight / 2);
+
+    // Set initial position
+    container.style.top = `${topPosition}px`;
+    container.style.left = `${startLeft}px`;
+
+    startFrameAnimation();
+
+    const duration = 10 * screenWidth; // 5 seconds to cross
+    const startTime = performance.now();
+
+    function animate(time) {
+      const elapsed = time - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const newLeft = startLeft + (endLeft - startLeft) * progress;
+      const newTop = startTop + (endTop - startTop) * progress;
+      container.style.left = `${newLeft}px`;
+      container.style.top = `${newTop}px`
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        clearInterval(animationInterval);
+        frames.forEach(f => f.style.display = 'none');
+        scheduleNextMove();
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  function scheduleNextMove() {
+    const delay = 4000 + Math.random() * 4000; // between 8s–12s
+    setTimeout(moveAcrossScreen, delay);
+  }
+
+  // Start the animation cycle
+  scheduleNextMove();
+
+
+
+
+
+
+
+        // // Bird animations
+
+        // const glideProportion = 0.8;
+        // const birdOffset = -120;
+        // const frameLength = 200;
+        // const frames = document.querySelectorAll('.frame');
+        // const totalFrames = frames.length;
+        // let frameIndex = 0;
+        // let animationInterval;
+
+        // function showNextFrame() {
+        //     frames.forEach((f, i) => f.style.display = 'none');
+        //     frames[frameIndex].style.display = 'block';
+        //     if (frameIndex === 0) {
+        //         frameIndex = Math.random() < glideProportion ? 0 : 1;
+        //     } else {
+        //         frameIndex = (frameIndex + 1) % totalFrames;
+        //     };
+        // };
+
+        // // setInterval(showNextFrame, 100);
+
+        // function startBirdAnimation() {
+        //     if (animationInterval) clearInterval(animationInterval);
+        //     animationInterval = setInterval(showNextFrame, frameLength);
+        // };
+
+        // function moveBirdAcrossScreen() {
+        //     const container = document.getElementById('bird-container');
+        //     const screenWidth = window.innerWidth;
+        //     const screenHeight = window.innerHeight;
+
+        //     const direction = Math.random() < 0.5 ? 'left' : 'right';
+        //     const topPosition = Math.random() * (screenHeight / 2);
+
+        //     const startLeft = direction === 'left' ? -birdOffset : screenWidth + birdOffset;
+        //     const endLeft = direction === 'left' ? screenWidth + birdOffset : -birdOffset;
+
+        //     container.style.top = `${topPosition}px`;
+        //     container.style.left = `${startLeft}px`;
+
+        //     startBirdAnimation();
+
+        //     const duration = 0.00001 * screenWidth;
+        //     const startTime = performance.now();
+
+        //     function animateBird(time) {
+        //         const elapsed = time - startTime;
+        //         const progress = Math.min(elapsed / duration, 1);
+        //         const newLeft = startLeft + (endLeft - startLeft) * progress;
+        //         container.style.left = `${newLeft}px`;
+
+        //         if (progress < 1) {
+        //             requestAnimationFrame(animate);
+        //         } else {
+        //             clearInterval(animationInterval);
+        //             frames.forEach(f => f.style.display = 'none');
+        //             scheduleNextMove();
+        //         };
+        //     };
+
+        //     requestAnimationFrame(animateBird);
+        // };
+
+        // function scheduleNextMove() {
+        //     const delay = 1000 + Math.random() * 1000; // between 8s–12s
+        //     setTimeout(moveBirdAcrossScreen, delay);
+        // };
+
+        // // scheduleNextMove();
+        // scheduleNextMove();
 
 
     </script>
-
-
-
-
-  <!-- <script>
-    const element = document.querySelector('.animate');
-    const vw = window.innerWidth;
-
-    const duration = Math.pow(vw, 2) * 0.2;
-
-
-    const backPath = document.getElementById('waveBackPath');
-    const frontPath = document.getElementById('waveFrontPath');
-    const boat = document.querySelector('.boat');
-
-    boat.style.setProperty('--animation-duration', `${duration}ms`);
-
-
-    let t = 0;
-
-    function animateBackWave() {
-        t += 0.01;
-        const amplitude = 8;
-        const waveLength = Math.max(0.06 * window.innerWidth, 360);
-        let d = "M0,160 ";
-        const width = 1440;
-
-        for (let x = 0; x <= width; x += 6) {
-            const y = 180 + Math.sin((x / waveLength) + t) * amplitude;
-            d += `L${x},${y} `;
-        }
-
-        d += `L1440,320 L0,320 Z`;
-        backPath.setAttribute("d", d);
-
-        // Move boat vertically to match wave at center X
-        const boatX = window.innerWidth / 2;
-        const relativeX = boatX * (1440 / window.innerWidth); // scale to SVG width
-
-        const boatY = 140 + Math.sin((relativeX / waveLength) + t) * amplitude;
-
-        const svgViewBoxHeight = 320; // from <svg viewBox="0 0 1440 320">
-        const container = document.querySelector('.wave-container');
-        const containerHeight = container.offsetHeight;
-
-        const scaledY = (boatY / svgViewBoxHeight) * containerHeight;
-        const boatHeight = boat.offsetHeight;
-
-        const newBottom = containerHeight - scaledY - (boatHeight / 2);
-        boat.style.bottom = `${newBottom}px`;
-
-        requestAnimationFrame(animateBackWave);
-    }
-
-    function animateFrontWave() {
-        t += 0.01;
-        const amplitude = 20;
-        const waveLength = 0.2 * window.innerWidth;
-        let d = "M0,160 ";
-        const width = 1440;
-        const offset = 60;
-
-        for (let x = 0; x <= width; x += 6) {
-            let y = 184 + Math.sin((x / waveLength) + t + offset) * amplitude;
-            d += `L${x},${y} `;
-        }
-
-        d += "L1440,320 L0,320 Z";
-        frontPath.setAttribute("d", d);
-
-        requestAnimationFrame(animateFrontWave);
-    }
-
-    animateBackWave();
-    animateFrontWave();
-  </script> -->
 
 </body>
 </html>
