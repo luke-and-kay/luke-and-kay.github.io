@@ -192,7 +192,7 @@
     const endLeft = direction === 'left-to-right' ? screenWidth + 120 : -120;
 
     const startTop = Math.random() * (screenHeight / 2);
-    const endTop = Math.random() * (screenHeight / 2);
+    const endTop = startTop + (2 * Math.random() - 1) * (screenHeight / 4);
 
     // Set initial position
     container.style.top = `${topPosition}px`;
