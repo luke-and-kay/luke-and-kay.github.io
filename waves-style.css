@@ -172,7 +172,6 @@ body {
 }
 
 .animation-container img {
-    width: 20px;
+    width: 40px;
     height: auto;
-    transform: rotate(15deg);
 }
