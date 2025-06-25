@@ -5,6 +5,11 @@ body {
     display: flex; 
 }
 
+span {
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .background {
     position: fixed;
     width: 100%;
@@ -57,26 +62,28 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    z-index: 20;
 }
 
 .announcement-subtext {
-    margin: 0;
     padding: 0;
     font-family: 'Bellefair', serif;
     color: white;
-    opacity: 0.7;
     font-size: 2.5vh;
+    line-height: 2.5vh;
     margin: 0.7vh 0;
+    padding-top: 0.2vh;
 }
 
 .announcement-text {
-    margin: 0;
     padding: 0;
     font-family: 'Old Standard TT', serif;
     font-weight: 700;
     color: white;
     font-size: 5vh;
+    line-height: 5vh;
     margin: 0.05vh 0;
+    padding-top: 0.8vh;
 }
 
 .announcement-ampersand {
@@ -86,6 +93,8 @@ body {
     font-weight: 700;
     color: white;
     font-size: 2.4vh;
+    line-height: 2.4vh;
+    padding-top: 0.384vh;
 }
 
 .date-container {
@@ -172,6 +181,6 @@ body {
 }
 
 .animation-container img {
-    width: 4vh;
+    width: 3vh;
     height: auto;
 }
