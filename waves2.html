@@ -26,7 +26,7 @@
                 d="M0,160 C360,240 1080,80 1440,160 L1440,320 L0,320 Z" 
             />
         </svg>
-        <img src="assets/boat.svg" alt="Boat" class="boat" />
+        <img src="assets/boat2.svg" alt="Boat" class="boat" />
         <svg 
             class="wave-front-svg" 
             viewBox="0 0 1440 320" 
@@ -69,15 +69,11 @@
         const frontWave = document.getElementById('waveFrontPath');
         const boat = document.querySelector('.boat');
 
-        // params.boat.xMax / window.innerWidth;
-
-
         const params = {
             svgWidth: 1440,
             svgHeight: 320,
             stepSize: 10,
             boat: {
-                // xFreq: 1000000 / Math.pow(window.innerWidth, 3),
                 xFreq: 0.115 / window.innerWidth,
                 xMax: 10,
                 yMax: 2.5,
@@ -137,6 +133,38 @@
         }
 
         requestAnimationFrame(oscillate);
+
+        function spawnBird() {
+            const bird = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            bird.setAttribute("class", "bird");
+            bird.setAttribute("width", "30");
+            bird.setAttribute("height", "30");
+            bird.innerHTML = `<use href="#bird" />`;
+
+            bird.style.position = "absolute";
+            bird.style.top = `${Math.random() * 60 + 10}%`; // upper 80% of screen
+            bird.style.left = "-50px";
+            bird.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
+
+            document.body.appendChild(bird);
+
+            const duration = Math.random() * 10 + 10; // 10–20s
+            bird.animate(
+                [
+                { transform: bird.style.transform + " translateX(0)" },
+                { transform: bird.style.transform + " translateX(110vw)" }
+                ],
+                {
+                duration: duration * 1000,
+                easing: "linear",
+                fill: "forwards"
+                }
+            );
+
+            setTimeout(() => bird.remove(), duration * 1000);
+        }
+
+        setInterval(spawnBird, 5000); // One bird every 5s
 
 
     </script>
