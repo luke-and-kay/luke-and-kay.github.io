@@ -138,14 +138,13 @@ span {
     color: white;
     font-family: 'Bellefair', serif;
     font-size: 1.5vh;
-    margin: 2vh 0;
 }
 
 input.pin-input {
     width: 1em;
     height: 2em;
     padding: 1vh;
-    margin: 0 0.1rem;
+    margin: 2vh 0.1rem;
     border-radius: 1rem;
     border: none;
     background-color: rgba(255, 255, 255, 0.4);
@@ -156,13 +155,21 @@ input.pin-input {
     caret-color: transparent;
     font-family: 'Lexend', serif;
     font-weight: 500;
+    cursor: default;
+}
+input.pin-input:hover {
+    background-color: rgba(255, 255, 255, 0.5);
 }
 input.pin-input:focus {
     background-color: rgba(255, 255, 255, 0.6);
-    box-shadow: 0 0 2vh rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 2vh rgba(0, 0, 0, 0.1);
     outline-offset: 0px;
     outline: none;
 }
+input.pin-input::selection {
+    background-color: rgba(255, 255, 255, 0);
+}
+
 
 input.pin-input::placeholder {
     color: #054D6A;
@@ -170,12 +177,37 @@ input.pin-input::placeholder {
 }
 
 .pin-action-container {
-    background-color: red;
     width: 100%;
+    display: flex;
+    justify-content: space-between;
 }
 
 .pin-action-button {
     width: 48%;
+    outline: none;
+    border: none;
+    padding: 1.5vh 3vh;
+    border-radius: 1rem;
+    font-size: 1.8vh;
+    font-family: 'Bellefair', serif;
+    box-shadow: 0 0 1vh rgba(0, 0, 0, 0.1);
+}
+
+.enter-button {
+    background-color: #0B5775;
+    color: white;
+}
+.enter-button:hover {
+    background-color: #054D6A;
+}
+
+.paste-button {
+    background-color: white;
+    color: #0B5775;
+}
+.paste-button:hover {
+    background-color: rgb(240, 240, 240);
+    color: #0B5775;
 }
 
 
