@@ -132,6 +132,7 @@ span {
     align-items: center;
     display: flex;
     flex-direction: column;
+    width: 100%;
 }
 
 .wedding-pin-login-title {
@@ -140,11 +141,19 @@ span {
     font-size: 1.5vh;
 }
 
+.pin-container {
+    width: 80vw;
+    max-width: 360px;
+    display: flex;
+    justify-content: space-between;
+    /* padding: 0 -1vw; */
+}
+
 input.pin-input {
     width: 1em;
     height: 2em;
     padding: 1vh;
-    margin: 2vh 0.5vw;
+    margin: 2vh 0;
     border-radius: 1rem;
     border: none;
     background-color: rgba(255, 255, 255, 0.4);
