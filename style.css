@@ -141,39 +141,44 @@ span {
     margin: 2vh 0;
 }
 
-.wedding-pin-input {
-    /* width: 100%; */
-    padding: 2vh 5vh;
-    border-radius: 40vh;
+input.pin-input {
+    width: 1em;
+    height: 2em;
+    padding: 1vh;
+    margin: 0 0.1rem;
+    border-radius: 1rem;
     border: none;
     background-color: rgba(255, 255, 255, 0.4);
     font-size: 2.8vh;
     line-height: 2.8vh;
     text-align: center;
     color: #054D6A;
-    letter-spacing: 1em;
-    text-indent: -1em;
     caret-color: transparent;
-    direction: rtl;
-    font-family: 'Bellefair', serif;
+    font-family: 'Lexend', serif;
+    font-weight: 500;
 }
-
-.wedding-pin-input:focus
-{
-    background-color: rgba(255, 255, 255, 0.5);
+input.pin-input:focus {
+    background-color: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 2vh rgba(0, 0, 0, 0.2);
     outline-offset: 0px;
-    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline: none;
 }
 
-.wedding-pin-input::placeholder {
+input.pin-input::placeholder {
     color: #054D6A;
     opacity: 1;
-  }
-  
-  .wedding-pin-input::-ms-input-placeholder {
-    color: #054D6A;
-  }
+}
+
+.pin-action-container {
+    background-color: red;
+    width: 100%;
+}
+
+.pin-action-button {
+    width: 48%;
+}
+
+
 
 
 
