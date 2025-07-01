@@ -125,6 +125,17 @@ span {
     margin-bottom: 1.7vh;
 }
 
+.landing-page-container {
+    max-width: 80%;
+    padding: 3vh 0;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    background-color: green;
+}
 
 .login-container {
     margin-top: 5vh;
@@ -142,8 +153,10 @@ span {
 }
 
 .pin-container {
-    width: 80vw;
-    max-width: 360px;
+    /* width: 80vw;
+    max-width: 360px; */
+    width: 100%;
+    min-width: 14em;
     display: flex;
     justify-content: space-between;
     /* padding: 0 -1vw; */
