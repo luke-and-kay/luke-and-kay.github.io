@@ -147,6 +147,7 @@ span {
     display: flex;
     justify-content: space-between;
     /* padding: 0 -1vw; */
+    background-color: red;
 }
 
 input.pin-input {
