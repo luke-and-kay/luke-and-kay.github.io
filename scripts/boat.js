@@ -1,3 +1,4 @@
+// Animates the SVG waves and boat bobbing motion on the landing view.
 const backWave = document.getElementById('waveBackPath');
 const frontWave = document.getElementById('waveFrontPath');
 const boat = document.querySelector('.boat');

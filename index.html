@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Save The Date!</title>
+    <title>Super Secret Login</title>
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="scripts/boat.js" defer></script>
     <script src="scripts/bird.js" defer></script>
+    <script src="scripts/auth.js" defer></script>
+    <script src="scripts/pin-input.js" defer></script>
+    <script src="scripts/logout-menu.js" defer></script>
+    <script src="scripts/nav-panel.js" defer></script>
 
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
     <link rel="stylesheet" href="style.css" />
@@ -14,11 +21,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="image_src" href="https://lukeandkay.co.uk/assets/thumbnail.png">
     <link 
-        href="https://fonts.googleapis.com/css2?family=Bellefair&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" 
-        rel="stylesheet" 
-    \>
+        href="https://fonts.googleapis.com/css2?family=Bellefair&family=Engagement&family=Lexend:wght@100..900&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" 
+        rel="stylesheet"
+    />
 </head>
-
 <body>
     <div class="background"></div>
 
@@ -29,6 +35,16 @@
         <img class="frame" src="assets/bird-frame-2.svg" style="display:none;">
     </div>
 
+    <div class="wave-underlay">
+        <div class="wave-underlay-overlay" aria-hidden="true"></div>
+        <div class="underlay-panel" aria-live="polite">
+            <button class="underlay-close" id="underlayClose" type="button" aria-label="Close panel">✕</button>
+            <div class="underlay-panel-body">
+                <p class="underlay-title" id="underlayTitle"></p>
+                <div class="underlay-content" id="underlayContent"></div>
+            </div>
+        </div>
+    </div>
     <div class="wave-container">
         <svg
             class="wave-back-svg" 
@@ -42,6 +58,7 @@
             />
         </svg>
         <img src="assets/boat.svg" alt="Boat" class="boat" />
+        <div class="water-content" id="waterContent" aria-hidden="true" tabindex="-1"></div>
         <svg 
             class="wave-front-svg" 
             viewBox="0 0 1440 320" 
@@ -55,28 +72,62 @@
         </svg>
     </div>
 
-    <div class="save-the-date-container">
-        <div class="announcement-subtext"><span>SAVE THE DATE</span></div>
-        <div class="announcement-text"><span>KAYLEIGH</span></div>
-        <div class="announcement-ampersand"><span>&</span></div>
-        <div class="announcement-text"><span>LUKE</span></div>
-        <div class="announcement-subtext"><span>ARE GETTING MARRIED!</span></div>
-        <div class="date-container">
-            <div class="date-subcontainer">
-                <div class="bordered-date">SAT</div>
-                <div class="date-day">20</div>
-                <div class="bordered-date">JUNE</div>
+    <div class="transition-wrapper">
+        <div class="login-container" id="loginContainer">
+            <p class="announcement">THE WEDDING OF</p>
+            <p class="couple-name">KAYLEIGH</p>
+            <p class="ampersand">&</p>
+            <p class="couple-name">LUKE</p>
+            <p class="enter-pin">ENTER YOUR WEDDING PIN BELOW</p>
+            <div class="pin-container" id="pinContainer">
+                <input type="text" placeholder="&#x2022" maxlength="1" class="pin-input" inputmode="numeric" pattern="[0-9]*" />
+                <input type="text" placeholder="&#x2022" maxlength="1" class="pin-input" inputmode="numeric" pattern="[0-9]*" />
+                <input type="text" placeholder="&#x2022" maxlength="1" class="pin-input" inputmode="numeric" pattern="[0-9]*" />
+                <input type="text" placeholder="&#x2022" maxlength="1" class="pin-input" inputmode="numeric" pattern="[0-9]*" />
+                <input type="text" placeholder="&#x2022" maxlength="1" class="pin-input" inputmode="numeric" pattern="[0-9]*" />
+                <input type="text" placeholder="&#x2022" maxlength="1" class="pin-input" inputmode="numeric" pattern="[0-9]*" />
             </div>
-            <div class="date-year">2026</div>
+            <div class="pin-action-container" id="pinActionContainer">
+                <button class="paste-button" id="pasteBtn">PASTE PIN</button>
+                <button class="enter-button" id="loginBtn">ENTER SITE</button>
+            </div>
+            <p id="error" class="login-error"> </p>
         </div>
-        <div class="location">BRISTOL, UK</div>
-        <div class="details-container">
-            <div class="details-1">formal invitation to follow</div>
-            <div class="details-2">
-                we hope you're able to celebrate with us, but if you already
-                know you're unavailable, please let Kayleigh or Luke know
+
+        <div class="logged-in-container" id="loggedInContainer">
+            <p class="announcement" id="loggedInContainerPartyName"></p>
+            <p class="announcement">you're invited to the wedding of</p>
+            <p class="couple-name">KAYLEIGH</p>
+            <p class="ampersand">&</p>
+            <p class="couple-name">LUKE</p>
+        </div>
+
+        <div class="logout-menu" id="logoutMenu">
+            <button 
+                class="logout-toggle" 
+                id="logoutToggle" 
+                aria-expanded="false" 
+                aria-controls="logoutMenuPanel" 
+                aria-label="Open menu"
+            >☰</button>
+            <div class="logout-menu-panel" id="logoutMenuPanel">
+                <button 
+                    class="logout-close" 
+                    id="logoutClose" 
+                    type="button" 
+                    aria-label="Close menu"
+                >✕</button>
+                <nav class="logout-nav" aria-label="Site">
+                    <a href="rsvp.html" class="logout-link">RSVP</a>
+                    <a href="schedule.html" class="logout-link">Schedule</a>
+                    <a href="faqs.html" class="logout-link">FAQs</a>
+                    <a href="challenge.html" class="logout-link">Challenge</a>
+                    <a href="travel.html" class="logout-link">Travel &amp; Accommodation</a>
+                </nav>
+                <button class="logout-button" id="logoutBtn" type="button">Logout</button>
             </div>
         </div>
     </div>
+
 </body>
 </html>

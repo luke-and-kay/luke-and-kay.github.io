@@ -1,3 +1,4 @@
+// Handles sprite animation and randomized bird flight across the viewport.
 const glideProportion = 0.8;
 const screenOffset = 240;
 const birdStartProportion = 0.75;
