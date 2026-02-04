@@ -20,6 +20,7 @@ body {
     z-index: -100;
 }
 
+
 /* PIN entry and login layout */
 .login-container {
     max-width: 80%;
@@ -187,6 +188,13 @@ body {
     line-height: 2vh;
     margin-bottom: 2vh;
     padding-top: 0.2vh;
+}
+.logged-in-container .date-location {
+    font-family: 'Bellefair', serif;
+    font-weight: 700;
+    font-size: 2em;
+    line-height: 2.4vh;
+    padding-top: 1em;
 }
 
 .entering-loader {
@@ -881,6 +889,43 @@ body {
     font-size: 1.6vh;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+}
+
+.faq-panel {
+    text-align: left;
+    display: grid;
+    gap: 2vh;
+    font-family: 'Bellefair', serif;
+    padding: 1.4vh 2em 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.faq-question {
+    margin: 0;
+    font-size: 2.4vh;
+    letter-spacing: 0.02em;
+}
+
+.faq-answer {
+    margin: 0.6vh 0 0;
+    font-size: 1.7vh;
+    line-height: 1.5;
+    opacity: 0.94;
+}
+
+.faq-item {
+    padding-bottom: 1.6vh;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.faq-item:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.faq-answer a {
+    color: white;
+    text-decoration: underline;
 }
 
 @media (max-width: 768px) {

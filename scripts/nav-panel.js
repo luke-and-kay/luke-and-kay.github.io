@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     links.forEach(link => {
+        // Allow external links (e.g., registry) to open normally.
+        if (link.target === '_blank') {
+            return;
+        }
+
         link.addEventListener('click', (event) => {
             event.preventDefault();
             const text = link.textContent?.trim() || 'Link';
@@ -126,6 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
             renderScheduleContent();
             return;
         }
+        if (text.toLowerCase() === 'faqs') {
+            renderFaqContent();
+            return;
+        }
 
         underlayContent.textContent = text;
     }
@@ -147,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </li>
                     <li class="schedule-item">
-                        <div class="schedule-time">15:30</div>
+                        <div class="schedule-time">15:15</div>
                         <div class="schedule-body">
                             <p class="schedule-heading">Cocktail Parade</p>
                             <p class="schedule-text">Leaving from <a class="schedule-link" href="https://maps.google.com/?q=Bristol%20Register%20Office" target="_blank" rel="noopener">Bristol Register Office</a></p>
@@ -155,10 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </li>
                     <li class="schedule-item">
-                        <div class="schedule-time">16:00</div>
+                        <div class="schedule-time">15:45</div>
                         <div class="schedule-body">
                             <p class="schedule-heading">Harbour Cruise</p>
-                            <p class="schedule-text">Departing from <a class="schedule-link" href="https://maps.app.goo.gl/8sRVJ7HpCAe1wUGL7" target="_blank" rel="noopener">Harbourside</a></p>
+                            <p class="schedule-text">Departing from <a class="schedule-link" href="https://maps.app.goo.gl/XmeXfENA1zp47vE88" target="_blank" rel="noopener">Castle Park Landing</a></p>
                             <p class="schedule-text">Drinks, snacks, and a scenic cruise along the River Avon</p>
                         </div>
                     </li>
@@ -180,6 +189,70 @@ document.addEventListener('DOMContentLoaded', () => {
                     </li>
                 </ol>
             </div>
+        `;
+    }
+
+    function renderFaqContent() {
+        if (!underlayContent) {
+            return;
+        }
+
+        underlayContent.innerHTML = `
+            <div class="faq-panel">
+                <div class="faq-item">
+                    <p class="faq-question">What time should I arrive?</p>
+                    <p class="faq-answer">If you're attending the ceremony, please arrive between 14:15 and 14:30 so you can get settled before we begin.</p>
+                    <p class="faq-answer">If you're joining us later in the day, please check the schedule for timings and locations.</p>
+                    <p class="faq-answer">Evening guests are welcome from 20:00 — we can't wait to celebrate with you!</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">How do I RSVP?</p>
+                    <p class="faq-answer">Please let us know whether you can join us via the RSVP page — it really helps us with our planning.</p>
+                    <p class="faq-answer">When you reply, please include any dietary requirements so we can make sure everyone is well catered for.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">Can I bring a plus one?</p>
+                    <p class="faq-answer">Due to limited venue capacity, we're only able to accommodate plus ones during the day if they're named on your invitation.</p>
+                    <p class="faq-answer">If you'd like to bring a guest in the evening, they're very welcome to join from 20:00 onwards — just let Luke or Kayleigh know.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">What date should I RSVP by?</p>
+                    <p class="faq-answer">We'd love to hear from you as soon as you can, but please RSVP by April 30th so we can finalise arrangements for our big day.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">Will the wedding be inside or outside?</p>
+                    <p class="faq-answer">The ceremony and evening reception will take place indoors.</p>
+                    <p class="faq-answer">However, the cocktail parade and harbour cruise will be outside — so we're hoping for sunshine!</p>
+                </div>
+                            
+                <div class="faq-item">
+                    <p class="faq-question">What do I wear?</p>
+                    <p class="faq-answer">Please join us in formal attire — we'd love to see everyone dressed their best for the occasion!</p>
+                    <p class="faq-answer">Think suits, ties, elegant dresses, and anything glamorous.</p>
+                    <p class="faq-answer">As there will be some walking and outdoor elements during the day, we recommend comfortable (but still dressy) shoes and bringing a light layer, just in case the British weather has its own plans.</p>
+                    <p class="faq-answer">We also kindly ask that guests avoid wearing white.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">Do you have a wedding registry?</p>
+                    <p class="faq-answer">Yes! We've created a registry with <a href="https://prezola.com/buy/view/273933">Prezola</a> for guests who would like to contribute towards our honeymoon.</p>
+                    <p class="faq-answer">Your presence at our wedding truly means more to us than any gift, and anything you give is completely optional.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">Can I take photos?</p>
+                    <p class="faq-answer">We'd love you to take photos throughout the day and share them with us — we can't wait to see them!</p>
+                    <p class="faq-answer">We just ask that no photos are taken during the ceremony, and that images of the bride and groom aren't posted on social media until we've shared our first photo as Mr & Mrs.</p>
+                </div>
+            </div>
+
+                
+                
+
         `;
     }
 
