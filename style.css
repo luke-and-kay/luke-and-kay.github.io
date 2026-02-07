@@ -191,7 +191,7 @@ body {
 }
 .logged-in-container .date-location {
     font-family: 'Bellefair', serif;
-    font-weight: 700;
+    font-weight: 400;
     font-size: 2em;
     line-height: 2.4vh;
     padding-top: 1em;
@@ -981,6 +981,7 @@ body {
     font-size: 1.7vh;
     line-height: 1.5;
     opacity: 0.94;
+    text-align: justify;
 }
 
 .faq-item {
