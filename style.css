@@ -458,6 +458,15 @@ body {
     padding-right: 0.8vh;
 }
 
+.panel-container {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.4vh 2em;
+    max-height: 65vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
 .underlay-content::-webkit-scrollbar {
     width: 0.8vh;
 }
@@ -740,6 +749,68 @@ body {
     background: #8f1d18;
 }
 
+.travel-panel {
+    display: grid;
+    gap: 1.6vh;
+    text-align: left;
+}
+
+.travel-section {
+    padding: 1vh 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.travel-section:last-of-type {
+    border-bottom: none;
+}
+
+.travel-heading {
+    margin: 0 0 0.6vh;
+    font-size: 2.2vh;
+    letter-spacing: 0.03em;
+}
+
+.travel-text {
+    margin: 0;
+    font-size: 1.7vh;
+    line-height: 1.5;
+    opacity: 0.92;
+}
+
+.hotel-list {
+    display: grid;
+    gap: 1vh;
+}
+
+.hotel-card {
+    padding: 1vh;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.6vh;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.hotel-name {
+    margin: 0 0 0.2vh;
+    font-size: 2vh;
+    letter-spacing: 0.02em;
+}
+
+.hotel-address {
+    margin: 0 0 0.2vh;
+    font-size: 1.7vh;
+    opacity: 0.9;
+}
+
+.hotel-link {
+    color: #d9f1ff;
+    text-decoration: underline;
+    font-size: 1.6vh;
+}
+
+.hotel-link:hover {
+    color: white;
+}
+
 .underlay-close {
     position: absolute;
     top: 1.4vh;
@@ -896,8 +967,7 @@ body {
     display: grid;
     gap: 2vh;
     font-family: 'Bellefair', serif;
-    padding: 1.4vh 2em 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+
 }
 
 .faq-question {

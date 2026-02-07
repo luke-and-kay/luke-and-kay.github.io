@@ -135,16 +135,28 @@ document.addEventListener('DOMContentLoaded', () => {
             renderFaqContent();
             return;
         }
-
-        underlayContent.textContent = text;
-    }
-
-    function renderScheduleContent() {
-        if (!underlayContent) {
+        if (text.toLowerCase() === 'challenge') {
+            renderChallengeContent();
+            return;
+        }
+        if (text.toLowerCase().includes('travel')) {
+            renderTravelContent();
             return;
         }
 
-        underlayContent.innerHTML = `
+        const container = ensurePanelContainer();
+        if (container) {
+            container.textContent = text;
+        }
+    }
+
+    function renderScheduleContent() {
+        const container = ensurePanelContainer();
+        if (!container) {
+            return;
+        }
+
+        container.innerHTML = `
             <div class="schedule-panel">
                 <ol class="schedule-timeline">
                     <li class="schedule-item">
@@ -193,11 +205,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderFaqContent() {
-        if (!underlayContent) {
+        const container = ensurePanelContainer();
+        if (!container) {
             return;
         }
 
-        underlayContent.innerHTML = `
+        container.innerHTML = `
             <div class="faq-panel">
                 <div class="faq-item">
                     <p class="faq-question">What time should I arrive?</p>
@@ -239,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div class="faq-item">
                     <p class="faq-question">Do you have a wedding registry?</p>
-                    <p class="faq-answer">Yes! We've created a registry with <a href="https://prezola.com/buy/view/273933">Prezola</a> for guests who would like to contribute towards our honeymoon.</p>
+                    <p class="faq-answer">Yes! We've created a registry with <a href="https://prezola.com/buy/view/273933" target="_blank" rel="noopener">Prezola</a> for guests who would like to contribute towards our honeymoon.</p>
                     <p class="faq-answer">Your presence at our wedding truly means more to us than any gift, and anything you give is completely optional.</p>
                 </div>
 
@@ -249,15 +262,119 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="faq-answer">We just ask that no photos are taken during the ceremony, and that images of the bride and groom aren't posted on social media until we've shared our first photo as Mr & Mrs.</p>
                 </div>
             </div>
+        `;
+    }
 
-                
-                
+    function renderChallengeContent() {
+        if (!underlayContent) {
+            return;
+        }
 
+        const container = ensurePanelContainer();
+        if (container) {
+            container.textContent = 'Coming soon!';
+        }
+    }
+
+    function renderTravelContent() {
+        const container = ensurePanelContainer();
+        if (!container) {
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="travel-panel">
+                <div class="travel-section">
+                    <p class="travel-heading">Hotels</p>
+                    <div class="hotel-list">
+                        <div class="hotel-card">
+                            <p class="hotel-name">Hort's Townhouse</p>
+                            <p class="hotel-address">49 Broad St, Bristol BS1 2EP</p>
+                            <a class="hotel-link" href="https://hortstownhousebristol.co.uk" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">The Bristol Hotel</p>
+                            <p class="hotel-address">Prince St, Bristol BS1 4QF</p>
+                            <a class="hotel-link" href="https://www.doylecollection.com/hotels/the-bristol-hotel" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Bristol Royal Marriott</p>
+                            <p class="hotel-address">College Green, Bristol BS1 5TA</p>
+                            <a class="hotel-link" href="https://www.marriott.com/en-us/hotels/brsry-bristol-marriott-royal-hotel" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Harbour Hotel</p>
+                            <p class="hotel-address">53-55 Corn St, Bristol BS1 1HT</p>
+                            <a class="hotel-link" href="https://www.harbourhotels.co.uk/our-hotels/bristol/harbour-hotel-bristol" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Claton Hotel</p>
+                            <p class="hotel-address">35, 37 Broad St, Bristol BS1 2EQ</p>
+                            <a class="hotel-link" href="https://www.claytonhotels.com/bristol-city/" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Premier Inn (King Street)</p>
+                            <p class="hotel-address">Llandoger Trow, King St, Bristol BS1 4ER</p>
+                            <a class="hotel-link" href="https://www.premierinn.com/gb/en/hotels/england/bristol/bristol/bristol-city-centre-king-street.html" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Delta Hotels Bristol City Centre</p>
+                            <p class="hotel-address">2 Lower Castle St, Bristol BS1 3AD</p>
+                            <a class="hotel-link" href="https://www.marriott.com/en-us/hotels/brsde-delta-hotels-bristol-city-centre/overview/" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Novotel Bristol Centre</p>
+                            <p class="hotel-address">Victoria St, Redcliffe, Bristol BS1 6HY</p>
+                            <a class="hotel-link" href="https://all.accor.com/hotel/5622/index.en.shtml" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+            
+                    </div>
+                </div>
+                <div class="travel-section">
+                    <p class="travel-heading">Travel</p>
+                    <div class="hotel-list">
+                        <div class="hotel-card">
+                            <p class="hotel-name">Bristol Temple Meads Train Station</p>
+                            <p class="hotel-address">Redcliffe, Bristol BS1 6QF</p>
+                            <p class="hotel-address">15 minute walk from Bristol Register Office</p>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">NCP Bristol Nelson Street</p>
+                            <p class="hotel-address">Nelson St, Bristol BS1 3DB</p>
+                            <a class="hotel-link" href="https://www.ncp.co.uk/find-a-car-park/car-parks/bristol-nelson-street" target="_blank" rel="noopener">Car park website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">NCP Baldwin Street</p>
+                            <p class="hotel-address">40 Baldwin St, Bristol BS1 1NR</p>
+                            <a class="hotel-link" href="https://www.ncp.co.uk/find-a-car-park/car-parks/bristol-baldwin-street" target="_blank" rel="noopener">Car park website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">The Grove Long Stay</p>
+                            <p class="hotel-address">40 The Grove, Bristol BS1 4RB</p>
+                            <a class="hotel-link" href="https://www.bristol.gov.uk/residents/parking/where-to-park-in-bristol/the-grove-long-stay-car-parkt" target="_blank" rel="noopener">Car park website</a>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
         `;
     }
 
     async function loadRsvpContent() {
-        if (!underlayContent) {
+        const container = ensurePanelContainer();
+        if (!container) {
             return;
         }
 
@@ -338,11 +455,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderRsvpForms(guests) {
-        if (!underlayContent) {
+        const container = ensurePanelContainer();
+        if (!container) {
             return;
         }
 
-        underlayContent.innerHTML = '';
+        container.innerHTML = '';
 
         if (!guests || guests.length === 0) {
             renderRsvpError('We could not find any guests for this invite.');
@@ -572,7 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        underlayContent.appendChild(formContainer);
+        container.appendChild(formContainer);
     }
 
     function buildDietaryText(data) {
@@ -937,15 +1055,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderRsvpError(message) {
-        if (!underlayContent) {
+        const container = ensurePanelContainer();
+        if (!container) {
             return;
         }
 
-        underlayContent.textContent = message;
+        container.textContent = message;
     }
 
     function showRsvpLoadingState() {
-        if (!underlayContent) {
+        const container = ensurePanelContainer();
+        if (!container) {
             return;
         }
 
@@ -958,8 +1078,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loadingForm.appendChild(loadingText);
 
-        underlayContent.innerHTML = '';
-        underlayContent.appendChild(loadingForm);
+        container.innerHTML = '';
+        container.appendChild(loadingForm);
+    }
+
+    function ensurePanelContainer() {
+        if (!underlayContent) {
+            return null;
+        }
+        let container = underlayContent.querySelector('.panel-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'panel-container';
+            // move existing children into the container to preserve current content
+            while (underlayContent.firstChild) {
+                container.appendChild(underlayContent.firstChild);
+            }
+            underlayContent.appendChild(container);
+        }
+        return container;
     }
 });
 
