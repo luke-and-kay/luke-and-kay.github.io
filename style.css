@@ -170,6 +170,7 @@ body {
     font-weight: 700;
     color: white;
     margin: 0;
+    text-align: center;
 }
 .logged-in-container .couple-name {
     font-size: 5vh;
@@ -196,6 +197,7 @@ body {
     line-height: 2.4vh;
     padding-top: 1em;
 }
+
 
 .entering-loader {
     display: inline-block;

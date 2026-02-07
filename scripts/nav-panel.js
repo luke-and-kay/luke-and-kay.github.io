@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <div class="faq-item">
-                    <p class="faq-question">Can I bring a plus one?</p>
+                    <p class="faq-question">Can I bring a plus one or children?</p>
                     <p class="faq-answer">Due to limited venue capacity, we're only able to accommodate plus ones during the day if they're named on your invitation.</p>
                     <p class="faq-answer">If you'd like to bring a guest in the evening, they're very welcome to join from 20:00 onwards — just let Luke or Kayleigh know.</p>
                 </div>
