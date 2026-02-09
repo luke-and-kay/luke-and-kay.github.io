@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="faq-item">
                     <p class="faq-question">Can I take photos?</p>
                     <p class="faq-answer">We'd love you to take photos throughout the day and share them with us — we can't wait to see them!</p>
-                    <p class="faq-answer">We just ask that no photos are taken during the ceremony, and that images of the bride and groom aren't posted on social media until we've shared our first photo as Mr & Mrs.</p>
+                    <p class="faq-answer">We just ask that no photos are taken during the ceremony.</p>
                 </div>
             </div>
         `;
