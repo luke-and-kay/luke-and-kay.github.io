@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="faq-item">
                     <p class="faq-question">What do I wear?</p>
                     <p class="faq-answer">Please join us in formal attire — we'd love to see everyone dressed their best for the occasion!</p>
-                    <p class="faq-answer">Think suits, ties, elegant dresses, and anything glamorous.</p>
+                    <p class="faq-answer">Think suits, ties, dresses, and anything fabulous!</p>
                     <p class="faq-answer">As there will be some walking and outdoor elements during the day, we recommend comfortable (but still dressy) shoes and bringing a light layer, just in case the British weather has its own plans.</p>
                     <p class="faq-answer">We also kindly ask that guests avoid wearing white.</p>
                 </div>
