@@ -500,8 +500,8 @@ body {
     display: grid;
     gap: 1.2vh;
     margin: 0 auto;
-    max-width: 420px;
-    width: 100%;
+    width: 70vw;
+    max-width: 720px;
     text-align: left;
 }
 
