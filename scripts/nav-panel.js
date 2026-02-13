@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </li>
                     <li class="schedule-item">
-                        <div class="schedule-time">20:00</div>
+                        <div class="schedule-time">20:30</div>
                         <div class="schedule-body">
                             <p class="schedule-heading">Evening</p>
                             <a class="schedule-link" href="https://maps.app.goo.gl/w7dXcijqcsYg6aJT9" target="_blank" rel="noopener">Riverstation</a>
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="faq-question">What time should I arrive?</p>
                     <p class="faq-answer">If you're attending the ceremony, please arrive between 14:15 and 14:30 so you can get settled before we begin.</p>
                     <p class="faq-answer">If you're joining us later in the day, please check the schedule for timings and locations.</p>
-                    <p class="faq-answer">Evening guests are welcome from 20:00 — we can't wait to celebrate with you!</p>
+                    <p class="faq-answer">Evening guests are welcome from 20:30 — we can't wait to celebrate with you!</p>
                 </div>
 
                 <div class="faq-item">
@@ -371,6 +371,24 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
     }
+
+    const STARTER_OPTIONS = [
+        { value: 'starter_terrine', label: 'Chicken & ham terrine' },
+        { value: 'starter_salmon', label: 'Hot smoked salmon' },
+        { value: 'starter_celeriac', label: 'Celeriac soup' },
+    ];
+
+    const MAIN_OPTIONS = [
+        { value: 'main_ox_cheek', label: 'Braised ox cheek' },
+        { value: 'main_fish_of_the_day', label: 'Fish of the day' },
+        { value: 'main_gnocchi', label: 'Wild mushroom gnocchi' },
+    ];
+
+    const DESSERT_OPTIONS = [
+        { value: 'dessert_chocolate_mousse', label: 'Dark chocolate mousse' },
+        { value: 'dessert_lemon_posset', label: 'Lemon posset' },
+        { value: 'dessert_rice_pudding', label: 'Coconut rice pudding' },
+    ];
 
     async function loadRsvpContent() {
         const container = ensurePanelContainer();
@@ -587,22 +605,15 @@ document.addEventListener('DOMContentLoaded', () => {
             attendanceSection.appendChild(attendanceField);
             fields.appendChild(attendanceSection);
 
+            const mealSection = buildMealSelectionSection({
+                index,
+                guestId: guest.id || index,
+                data
+            });
+            fields.appendChild(mealSection.wrapper);
+
             const dietarySection = document.createElement('div');
             dietarySection.className = 'rsvp-section rsvp-dietary-group';
-
-            const dietCheckboxes = buildCheckboxGroup({
-                id: `rsvp-dietary-options-${index}`,
-                name: `dietary-options-${guest.id || index}`,
-                legend: 'Dietary requirements',
-                options: [
-                    { value: 'vegan', label: 'Vegan', checked: !!data.vegan },
-                    { value: 'vegetarian', label: 'Vegetarian', checked: !!data.vegetarian },
-                ],
-                values: {}
-            });
-            const dietaryCheckboxes = Array.from(dietCheckboxes.querySelectorAll('input[type="checkbox"]'));
-            enforceExclusiveCheckboxes(dietaryCheckboxes);
-
             const dietaryTextField = buildInputField({
                 id: `rsvp-dietary-${index}`,
                 name: `dietary-${guest.id || index}`,
@@ -612,8 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 value: buildDietaryText(data)
             });
             dietaryTextField.wrapper.classList.add('rsvp-dietary-text');
-            dietCheckboxes.appendChild(dietaryTextField.wrapper);
-            dietarySection.appendChild(dietCheckboxes);
+            dietarySection.appendChild(dietaryTextField.wrapper);
             fields.appendChild(dietarySection);
 
             const questionSection = document.createElement('div');
@@ -651,7 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     guestId: guest.id,
                     attendanceValues,
                     attendanceCheckboxes,
-                    dietaryCheckboxes,
+                    mealSelections: mealSection.selections,
                     dietaryTextInput: dietaryTextField.input,
                     firstNameInput: firstNameInput.input,
                     lastNameInput: lastNameInput.input,
@@ -695,16 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function buildDietaryText(data) {
         const dietary = (data.dietary_requirements || '').trim();
-        if (dietary) {
-            return dietary;
-        }
-        if (data.vegan) {
-            return 'Vegan';
-        }
-        if (data.vegetarian) {
-            return 'Vegetarian';
-        }
-        return '';
+        return dietary ? dietary : '';
     }
 
     function buildInputField({ id, name, label, placeholder, type, value }) {
@@ -793,6 +794,112 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
     }
 
+    function buildMealSelectionSection({ index, guestId, data }) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'rsvp-section rsvp-meal-group';
+
+        const heading = document.createElement('p');
+        heading.className = 'rsvp-questions-caption';
+        heading.textContent = 'Please choose one starter, one main, and one dessert.';
+        wrapper.appendChild(heading);
+
+        const starterGroup = buildCourseGroup({
+            id: `rsvp-starter-${index}`,
+            legend: 'Starter',
+            options: STARTER_OPTIONS,
+            selectedValue: getExistingCourseSelection(data, STARTER_OPTIONS),
+            guestId
+        });
+
+        const mainGroup = buildCourseGroup({
+            id: `rsvp-main-${index}`,
+            legend: 'Main',
+            options: MAIN_OPTIONS,
+            selectedValue: getExistingCourseSelection(data, MAIN_OPTIONS),
+            guestId
+        });
+
+        const dessertGroup = buildCourseGroup({
+            id: `rsvp-dessert-${index}`,
+            legend: 'Dessert',
+            options: DESSERT_OPTIONS,
+            selectedValue: getExistingCourseSelection(data, DESSERT_OPTIONS),
+            guestId
+        });
+
+        wrapper.appendChild(starterGroup.wrapper);
+        wrapper.appendChild(mainGroup.wrapper);
+        wrapper.appendChild(dessertGroup.wrapper);
+
+        return {
+            wrapper,
+            selections: {
+                starter: starterGroup,
+                main: mainGroup,
+                dessert: dessertGroup
+            }
+        };
+    }
+
+    function buildCourseGroup({ id, legend, options, selectedValue, guestId }) {
+        const wrapper = document.createElement('fieldset');
+        wrapper.className = 'rsvp-checkbox-group rsvp-radio-group';
+        wrapper.id = id;
+
+        const legendEl = document.createElement('legend');
+        legendEl.textContent = legend;
+        wrapper.appendChild(legendEl);
+
+        const list = document.createElement('div');
+        list.className = 'rsvp-checkboxes';
+
+        const radios = [];
+        options.forEach((option, idx) => {
+            const optionId = `${id}-${idx}`;
+            const item = document.createElement('div');
+            item.className = 'rsvp-checkbox-item';
+
+            const labelEl = buildLabel(option.label, optionId);
+            labelEl.style.textAlign = 'left';
+
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.id = optionId;
+            input.name = `${id}-choice-${guestId || 'guest'}`;
+            input.value = option.value;
+            input.checked = option.value === selectedValue;
+
+            item.appendChild(labelEl);
+            item.appendChild(input);
+            list.appendChild(item);
+            radios.push(input);
+        });
+
+        wrapper.appendChild(list);
+
+        return { wrapper, radios };
+    }
+
+    function getExistingCourseSelection(data, options) {
+        if (!data || !options) {
+            return '';
+        }
+        const existingKey = options.find((option) => data[option.value]) || null;
+        return existingKey ? existingKey.value : '';
+    }
+
+    function getSelectedCourseValue(radios) {
+        const selected = Array.from(radios || []).find((radio) => radio.checked);
+        return selected ? selected.value : '';
+    }
+
+    function buildCoursePayload(selectedValue, options) {
+        return (options || []).reduce((acc, option) => {
+            acc[option.value] = option.value === selectedValue;
+            return acc;
+        }, {});
+    }
+
     function buildLabel(text, forId) {
         const labelEl = document.createElement('label');
         labelEl.setAttribute('for', forId);
@@ -853,7 +960,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return updated;
     }
 
-    function validateGuestInputs({ firstNameInput, lastNameInput, emailInput, phoneInput, questionInputs }) {
+    function validateGuestInputs({ firstNameInput, lastNameInput, emailInput, phoneInput, questionInputs, mealSelections }) {
         const missing = [];
         if (!firstNameInput?.value.trim()) {
             missing.push('First Name');
@@ -866,6 +973,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (!phoneInput?.value.trim()) {
             missing.push('Phone Number');
+        }
+
+        if (!getSelectedCourseValue(mealSelections?.starter?.radios)) {
+            missing.push('Starter choice');
+        }
+        if (!getSelectedCourseValue(mealSelections?.main?.radios)) {
+            missing.push('Main course choice');
+        }
+        if (!getSelectedCourseValue(mealSelections?.dessert?.radios)) {
+            missing.push('Dessert choice');
         }
 
         const answeredCount = Array.isArray(questionInputs)
@@ -898,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', () => {
         guestId,
         attendanceValues,
         attendanceCheckboxes,
-        dietaryCheckboxes,
+        mealSelections,
         dietaryTextInput,
         firstNameInput,
         lastNameInput,
@@ -928,7 +1045,8 @@ document.addEventListener('DOMContentLoaded', () => {
             lastNameInput,
             emailInput,
             phoneInput,
-            questionInputs
+            questionInputs,
+            mealSelections
         });
 
         if (!validation.valid) {
@@ -948,9 +1066,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const updatedAttendance = gatherAttendanceValues(attendanceValues, attendanceCheckboxes);
-            const isVegan = dietaryCheckboxes.some((cb) => cb.value === 'vegan' && cb.checked);
-            const isVegetarian = dietaryCheckboxes.some((cb) => cb.value === 'vegetarian' && cb.checked);
             const dietaryText = (dietaryTextInput?.value || '').trim();
+            const starterChoice = getSelectedCourseValue(mealSelections?.starter?.radios);
+            const mainChoice = getSelectedCourseValue(mealSelections?.main?.radios);
+            const dessertChoice = getSelectedCourseValue(mealSelections?.dessert?.radios);
 
             const payload = {
                 first_name: (firstNameInput?.value || '').trim(),
@@ -959,9 +1078,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 phone_number: (phoneInput?.value || '').trim(),
                 attendance: updatedAttendance,
                 dietary_requirements: dietaryText,
-                vegan: isVegan,
-                vegetarian: isVegetarian,
+                vegan: false,
+                vegetarian: false,
                 submitted_form: true,
+                ...buildCoursePayload(starterChoice, STARTER_OPTIONS),
+                ...buildCoursePayload(mainChoice, MAIN_OPTIONS),
+                ...buildCoursePayload(dessertChoice, DESSERT_OPTIONS),
             };
 
             if (Array.isArray(questionInputs)) {
