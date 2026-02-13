@@ -373,21 +373,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const STARTER_OPTIONS = [
-        { value: 'starter_terrine', label: 'Chicken & ham terrine' },
-        { value: 'starter_salmon', label: 'Hot smoked salmon' },
-        { value: 'starter_celeriac', label: 'Celeriac soup' },
+        { value: 'starter_terrine', label: 'Ham hock terrine, sauce gribiche, house pickles' },
+        { value: 'starter_salmon', label: 'Cured Loch Duart salmon, chilli, citrus' },
+        { value: 'starter_celeriac', label: 'Salt-baked celeriac, walnut, misocrème fraîche, leaves' },
     ];
 
     const MAIN_OPTIONS = [
-        { value: 'main_ox_cheek', label: 'Braised ox cheek' },
-        { value: 'main_fish_of_the_day', label: 'Fish of the day' },
-        { value: 'main_gnocchi', label: 'Wild mushroom gnocchi' },
+        { value: 'main_ox_cheek', label: 'Aberdeen Angus ox cheek, mustard mash, seasonal veg' },
+        { value: 'main_fish_of_the_day', label: 'Market fish of the day, new potatoes, seasonal veg' },
+        { value: 'main_gnocchi', label: 'Gnocchi, courgette, aged parmesan' },
     ];
 
     const DESSERT_OPTIONS = [
-        { value: 'dessert_chocolate_mousse', label: 'Dark chocolate mousse' },
-        { value: 'dessert_lemon_posset', label: 'Lemon posset' },
-        { value: 'dessert_rice_pudding', label: 'Coconut rice pudding' },
+        { value: 'dessert_chocolate_mousse', label: 'Dark chocolate mousse, seasonal fruit' },
+        { value: 'dessert_lemon_posset', label: 'Lemon posset, oat crumble' },
+        { value: 'dessert_rice_pudding', label: 'Coconut rice pudding, seasonal berries' },
     ];
 
     async function loadRsvpContent() {
