@@ -617,8 +617,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const dietaryTextField = buildInputField({
                 id: `rsvp-dietary-${index}`,
                 name: `dietary-${guest.id || index}`,
-                label: 'Allergies or other dietary needs? (optional)',
-                placeholder: 'e.g. nut allergy, gluten free',
+                label: 'Dietary preferences, allergies or other dietary needs? (optional)',
+                placeholder: 'e.g. vegan, nut allergy, gluten free',
                 type: 'text',
                 value: buildDietaryText(data)
             });
@@ -647,6 +647,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 questionSection.appendChild(questionField.wrapper);
             });
             fields.appendChild(questionSection);
+
+            const refreshBreakfastSpecificFields = () => {
+                const updatedAttendance = gatherAttendanceValues(attendanceValues, attendanceCheckboxes);
+                setBreakfastSpecificSectionsVisibility({
+                    attendanceValues: updatedAttendance,
+                    mealSection: mealSection.wrapper,
+                    questionSection
+                });
+                syncGuestFieldsHeight(form, fields);
+            };
+            refreshBreakfastSpecificFields();
+            attendanceCheckboxes.forEach((checkbox) => {
+                checkbox.addEventListener('change', refreshBreakfastSpecificFields);
+            });
 
             const submitButton = document.createElement('button');
             submitButton.type = 'button';
@@ -960,7 +974,33 @@ document.addEventListener('DOMContentLoaded', () => {
         return updated;
     }
 
-    function validateGuestInputs({ firstNameInput, lastNameInput, emailInput, phoneInput, questionInputs, mealSelections }) {
+    function isAttendingWeddingBreakfast(attendanceValues) {
+        return !!attendanceValues?.wedding_breakfast;
+    }
+
+    function setBreakfastSpecificSectionsVisibility({ attendanceValues, mealSection, questionSection }) {
+        const shouldShow = isAttendingWeddingBreakfast(attendanceValues);
+
+        if (mealSection) {
+            mealSection.style.display = shouldShow ? '' : 'none';
+            mealSection.setAttribute('aria-hidden', String(!shouldShow));
+        }
+
+        if (questionSection) {
+            questionSection.style.display = shouldShow ? '' : 'none';
+            questionSection.setAttribute('aria-hidden', String(!shouldShow));
+        }
+    }
+
+    function validateGuestInputs({
+        firstNameInput,
+        lastNameInput,
+        emailInput,
+        phoneInput,
+        questionInputs,
+        mealSelections,
+        attendanceValues
+    }) {
         const missing = [];
         if (!firstNameInput?.value.trim()) {
             missing.push('First Name');
@@ -975,17 +1015,20 @@ document.addEventListener('DOMContentLoaded', () => {
             missing.push('Phone Number');
         }
 
-        if (!getSelectedCourseValue(mealSelections?.starter?.radios)) {
-            missing.push('Starter choice');
-        }
-        if (!getSelectedCourseValue(mealSelections?.main?.radios)) {
-            missing.push('Main course choice');
-        }
-        if (!getSelectedCourseValue(mealSelections?.dessert?.radios)) {
-            missing.push('Dessert choice');
+        const attendingWeddingBreakfast = isAttendingWeddingBreakfast(attendanceValues);
+        if (attendingWeddingBreakfast) {
+            if (!getSelectedCourseValue(mealSelections?.starter?.radios)) {
+                missing.push('Starter choice');
+            }
+            if (!getSelectedCourseValue(mealSelections?.main?.radios)) {
+                missing.push('Main course choice');
+            }
+            if (!getSelectedCourseValue(mealSelections?.dessert?.radios)) {
+                missing.push('Dessert choice');
+            }
         }
 
-        const answeredCount = Array.isArray(questionInputs)
+        const answeredCount = attendingWeddingBreakfast && Array.isArray(questionInputs)
             ? questionInputs.filter((entry) => entry?.input?.value.trim()).length
             : 0;
 
@@ -993,14 +1036,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (missing.length > 0) {
             messages.push(`Complete: ${missing.join(', ')}`);
         }
-        if (answeredCount < 3) {
+        if (attendingWeddingBreakfast && answeredCount < 3) {
             messages.push(`Answer at least 3 of the 5 entertainment questions (currently ${answeredCount})`);
         }
 
         if (messages.length > 0) {
             const bulletList = [
                 ...missing.map((item) => `- ${item}`),
-                ...(answeredCount < 3 ? [`- Answer at least 3 of the 5 entertainment questions (currently ${answeredCount})`] : [])
+                ...(attendingWeddingBreakfast && answeredCount < 3 ? [`- Answer at least 3 of the 5 entertainment questions (currently ${answeredCount})`] : [])
             ];
             return {
                 valid: false,
@@ -1040,13 +1083,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         submitButton.classList.remove('invalid');
 
+        const updatedAttendance = gatherAttendanceValues(attendanceValues, attendanceCheckboxes);
+
         const validation = validateGuestInputs({
             firstNameInput,
             lastNameInput,
             emailInput,
             phoneInput,
             questionInputs,
-            mealSelections
+            mealSelections,
+            attendanceValues: updatedAttendance
         });
 
         if (!validation.valid) {
@@ -1065,7 +1111,6 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.textContent = 'Saving...';
 
         try {
-            const updatedAttendance = gatherAttendanceValues(attendanceValues, attendanceCheckboxes);
             const dietaryText = (dietaryTextInput?.value || '').trim();
             const starterChoice = getSelectedCourseValue(mealSelections?.starter?.radios);
             const mainChoice = getSelectedCourseValue(mealSelections?.main?.radios);
@@ -1135,7 +1180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         toggle.setAttribute('aria-expanded', String(expanded));
         if (expanded) {
             fields.style.display = 'grid';
-            fields.style.maxHeight = `${fields.scrollHeight}px`;
+            syncGuestFieldsHeight(form, fields);
         } else {
             fields.style.maxHeight = '0px';
             // delay hiding display to allow animation
@@ -1145,6 +1190,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 650);
         }
+    }
+
+    function syncGuestFieldsHeight(form, fields) {
+        if (!form || !fields || form.classList.contains('collapsed')) {
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            fields.style.maxHeight = `${fields.scrollHeight}px`;
+        });
     }
 
     function enforceExclusiveCheckboxes(checkboxes) {
