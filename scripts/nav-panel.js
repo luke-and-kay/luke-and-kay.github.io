@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <div class="faq-item">
                     <p class="faq-question">What date should I RSVP by?</p>
-                    <p class="faq-answer">We'd love to hear from you as soon as you can, but please RSVP by April 30th so we can finalise arrangements for our big day.</p>
+                    <p class="faq-answer">We'd love to hear from you as soon as you can, but please RSVP by April 30th so we can finalise arrangements for our big day (evening guests may RSVP by May 31st).</p>
                 </div>
 
                 <div class="faq-item">
