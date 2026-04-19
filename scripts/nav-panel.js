@@ -978,6 +978,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return !!attendanceValues?.wedding_breakfast;
     }
 
+    function isAttendingAnyEvent(attendanceValues) {
+        return Object.values(attendanceValues || {}).some(Boolean);
+    }
+
     function setBreakfastSpecificSectionsVisibility({ attendanceValues, mealSection, questionSection }) {
         const shouldShow = isAttendingWeddingBreakfast(attendanceValues);
 
@@ -1002,17 +1006,22 @@ document.addEventListener('DOMContentLoaded', () => {
         attendanceValues
     }) {
         const missing = [];
+        const attendingAnyEvent = isAttendingAnyEvent(attendanceValues);
+
         if (!firstNameInput?.value.trim()) {
             missing.push('First Name');
         }
-        if (!lastNameInput?.value.trim()) {
-            missing.push('Last Name');
-        }
-        if (!emailInput?.value.trim()) {
-            missing.push('Email Address');
-        }
-        if (!phoneInput?.value.trim()) {
-            missing.push('Phone Number');
+
+        if (attendingAnyEvent) {
+            if (!lastNameInput?.value.trim()) {
+                missing.push('Last Name');
+            }
+            if (!emailInput?.value.trim()) {
+                missing.push('Email Address');
+            }
+            if (!phoneInput?.value.trim()) {
+                missing.push('Phone Number');
+            }
         }
 
         const attendingWeddingBreakfast = isAttendingWeddingBreakfast(attendanceValues);
@@ -1161,7 +1170,18 @@ document.addEventListener('DOMContentLoaded', () => {
         form.classList.add('submitted');
         submitButton.textContent = 'Update RSVP';
         submitButton.classList.add('submitted');
-        let icon = statusEl;
+
+        const existingIcons = toggle
+            ? Array.from(toggle.querySelectorAll('.rsvp-status-icon'))
+            : [];
+        let icon = statusEl || existingIcons[0] || null;
+
+        existingIcons.forEach((existingIcon) => {
+            if (existingIcon !== icon) {
+                existingIcon.remove();
+            }
+        });
+
         if (!icon && toggle) {
             icon = document.createElement('span');
             icon.className = 'rsvp-status-icon submitted';
@@ -1306,4 +1326,3 @@ function closeNavMenu(menu, toggle) {
     toggle.setAttribute('aria-expanded', 'false');
     toggle.setAttribute('aria-label', 'Open menu');
 }
-ƒƒƒƒƒƒƒƒƒƒƒƒƒ
