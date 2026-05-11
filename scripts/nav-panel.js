@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isPanelAnimating = false;
     let activeRsvpRequestId = 0;
     const links = Array.from(document.querySelectorAll('.logout-link'));
+    const challengeLink = links.find((link) => (link.textContent || '').trim().toLowerCase() === 'challenge') || null;
     const menu = document.getElementById('logoutMenu');
     const toggle = document.getElementById('logoutToggle');
     const wrapper = document.querySelector('.transition-wrapper');
@@ -31,6 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
             closeNavMenu(menu, toggle);
         });
     });
+
+    if (typeof auth !== 'undefined') {
+        auth.onAuthStateChanged(updateChallengeNavVisibility);
+    }
 
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
@@ -407,28 +412,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const partyDoc = await db.collection('users').doc(weddingPin).get();
+            const guests = await loadGuestsForWeddingPin(weddingPin);
             if (activeRsvpRequestId !== requestId) {
                 return;
             }
-            if (!partyDoc.exists) {
-                renderRsvpError('We could not find your invite. Please try again.');
-                return;
-            }
-
-            const partyData = partyDoc.data() || {};
-            const guestRefs = Array.isArray(partyData.guests) ? partyData.guests : [];
-            const guestSnapshots = await Promise.all(
-                guestRefs.map((ref) => ref.get().catch(() => null))
-            );
-
-            if (activeRsvpRequestId !== requestId) {
-                return;
-            }
-
-            const guests = guestSnapshots
-                .filter((snap) => snap && snap.exists)
-                .map((snap) => ({ id: snap.id, data: snap.data() || {} }));
 
             renderRsvpForms(guests);
         } catch (error) {
@@ -450,6 +437,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         return '';
+    }
+
+    async function loadGuestsForWeddingPin(weddingPin) {
+        if (!weddingPin || typeof db === 'undefined') {
+            throw new Error('Missing invite details');
+        }
+
+        const partyDoc = await db.collection('users').doc(weddingPin).get();
+        if (!partyDoc.exists) {
+            throw new Error('Invite not found');
+        }
+
+        const partyData = partyDoc.data() || {};
+        const guestRefs = Array.isArray(partyData.guests) ? partyData.guests : [];
+        const guestSnapshots = await Promise.all(
+            guestRefs.map((ref) => ref.get().catch(() => null))
+        );
+
+        return guestSnapshots
+            .filter((snap) => snap && snap.exists)
+            .map((snap) => ({ id: snap.id, data: snap.data() || {} }));
+    }
+
+    async function updateChallengeNavVisibility(user) {
+        if (!challengeLink) {
+            return;
+        }
+
+        if (!user?.email) {
+            challengeLink.hidden = false;
+            return;
+        }
+
+        try {
+            const weddingPin = user.email.split('@')[0];
+            const guests = await loadGuestsForWeddingPin(weddingPin);
+            const isEveningOnlyParty = guests.length > 0 && guests.every((guest) => (
+                isEveningOnlyGuest(normalizeAttendanceMap(guest.data?.attendance))
+            ));
+
+            challengeLink.hidden = isEveningOnlyParty;
+        } catch (error) {
+            console.error('Failed to update challenge nav visibility', error);
+            challengeLink.hidden = false;
+        }
     }
 
     function formatGuestName(data) {
@@ -482,6 +514,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!guests || guests.length === 0) {
             renderRsvpError('We could not find any guests for this invite.');
+            return;
+        }
+
+        if (guests.some((guest) => !isEveningOnlyGuest(normalizeAttendanceMap(guest.data?.attendance)))) {
+            renderClosedRsvpMessage();
             return;
         }
 
@@ -715,6 +752,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         container.appendChild(formContainer);
+    }
+
+    function isEveningOnlyGuest(attendanceValues) {
+        const attendingEvents = Object.entries(attendanceValues || {})
+            .filter(([, isAttending]) => isAttending)
+            .map(([eventName]) => eventName);
+
+        return attendingEvents.length === 1 && attendingEvents[0] === 'evening';
+    }
+
+    function renderClosedRsvpMessage() {
+        const container = ensurePanelContainer();
+        if (!container) {
+            return;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'underlay-form rsvp-guest-card rsvp-closed-card';
+        card.setAttribute('aria-label', 'RSVP closed');
+
+        const message = document.createElement('p');
+        message.className = 'rsvp-closed-message';
+        message.textContent = 'The RSVP form is closed now, but if you would like to make any changes please reach out to Luke or Kay.';
+
+        card.appendChild(message);
+
+        container.innerHTML = '';
+        container.appendChild(card);
     }
 
     function buildDietaryText(data) {
