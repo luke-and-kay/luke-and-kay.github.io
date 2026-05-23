@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const menu = document.getElementById('logoutMenu');
     const toggle = document.getElementById('logoutToggle');
     const wrapper = document.querySelector('.transition-wrapper');
+    const RSVP_OPEN_PIN_EXCEPTIONS = new Set(['730422']);
 
     if (!wave || !waterContent || links.length === 0) {
         return;
@@ -417,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            renderRsvpForms(guests);
+            renderRsvpForms(guests, weddingPin);
         } catch (error) {
             console.error('Failed to load RSVP content', error);
             if (activeRsvpRequestId === requestId) {
@@ -504,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return '';
     }
 
-    function renderRsvpForms(guests) {
+    function renderRsvpForms(guests, weddingPin) {
         const container = ensurePanelContainer();
         if (!container) {
             return;
@@ -517,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (guests.some((guest) => !isEveningOnlyGuest(normalizeAttendanceMap(guest.data?.attendance)))) {
+        if (isRsvpClosedForParty(guests, weddingPin)) {
             renderClosedRsvpMessage();
             return;
         }
@@ -752,6 +753,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         container.appendChild(formContainer);
+    }
+
+    function isRsvpClosedForParty(guests, weddingPin) {
+        if (RSVP_OPEN_PIN_EXCEPTIONS.has(String(weddingPin || ''))) {
+            return false;
+        }
+
+        return guests.some((guest) => !isEveningOnlyGuest(normalizeAttendanceMap(guest.data?.attendance)));
     }
 
     function isEveningOnlyGuest(attendanceValues) {
