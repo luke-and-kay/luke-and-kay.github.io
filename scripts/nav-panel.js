@@ -25,9 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const text = link.textContent?.trim() || 'Link';
+        if (text.toLowerCase() === 'challenge') {
+            return;
+        }
+
         link.addEventListener('click', (event) => {
             event.preventDefault();
-            const text = link.textContent?.trim() || 'Link';
             setUnderlayContent(text);
             openWater();
             closeNavMenu(menu, toggle);
