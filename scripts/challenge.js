@@ -416,7 +416,7 @@ function formatChallengeQuestion(entry) {
     const possessiveName = formatPossessiveName(displayName);
 
     if (questionType === 'holiday') {
-        return `What is ${possessiveName} favourite holiday destination?`;
+        return `Where is ${possessiveName} favourite holiday destination?`;
     }
 
     if (questionType === 'movie') {
