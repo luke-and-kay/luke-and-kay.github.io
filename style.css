@@ -1008,11 +1008,12 @@ body {
     border: 0.85rem solid rgba(255, 255, 255, 0.92);
     background:
         linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)),
-        url("assets/thumbnail.png") center / cover;
+        var(--photos-print-image) center / cover;
     box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.24);
 }
 
 .photos-print-large {
+    --photos-print-image: url("assets/photos/3aad6404-8d3a-4caa-8ca1-228382803f1d.jpeg");
     width: min(82%, 20rem);
     aspect-ratio: 4 / 5;
     left: 7%;
@@ -1021,10 +1022,11 @@ body {
 }
 
 .photos-print-small {
+    --photos-print-image: url("assets/photos/40ae6f79-761a-4b80-bb7d-0fa936c5f288.jpeg");
     width: min(55%, 13rem);
     aspect-ratio: 1 / 1;
     right: 0;
-    bottom: 6%;
+    bottom: -10%;
     transform: rotate(7deg);
     background-position: center bottom;
 }
