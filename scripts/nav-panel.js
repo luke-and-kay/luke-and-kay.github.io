@@ -1,0 +1,1418 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const wave = document.querySelector('.wave-container');
+    const waveUnderlay = document.querySelector('.wave-underlay');
+    const waterContent = document.getElementById('waterContent');
+    const underlayTitle = document.getElementById('underlayTitle');
+    const underlayContent = document.getElementById('underlayContent');
+    const underlayClose = document.getElementById('underlayClose');
+    const underlayPanelBody = document.querySelector('.underlay-panel-body');
+    let isPanelAnimating = false;
+    let activeRsvpRequestId = 0;
+    const links = Array.from(document.querySelectorAll('.logout-link'));
+    const challengeLink = links.find((link) => (link.textContent || '').trim().toLowerCase() === 'challenge') || null;
+    const menu = document.getElementById('logoutMenu');
+    const toggle = document.getElementById('logoutToggle');
+    const wrapper = document.querySelector('.transition-wrapper');
+    const RSVP_OPEN_PIN_EXCEPTIONS = new Set(['730422']);
+
+    if (!wave || !waterContent || links.length === 0) {
+        return;
+    }
+
+    links.forEach(link => {
+        // Allow external links (e.g., registry) to open normally.
+        if (link.target === '_blank') {
+            return;
+        }
+
+        const text = link.textContent?.trim() || 'Link';
+        if (text.toLowerCase() === 'challenge') {
+            return;
+        }
+        if (text.toLowerCase() === 'photos') {
+            link.addEventListener('click', (event) => {
+                if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                    return;
+                }
+
+                event.preventDefault();
+                closeNavMenu(menu, toggle);
+                window.location.assign(link.href);
+            });
+            return;
+        }
+
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            setUnderlayContent(text);
+            openWater();
+            closeNavMenu(menu, toggle);
+        });
+    });
+
+    if (typeof auth !== 'undefined') {
+        auth.onAuthStateChanged(updateChallengeNavVisibility);
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeWater(wave, waterContent, wrapper, waveUnderlay);
+        }
+    });
+
+    if (underlayClose) {
+        underlayClose.addEventListener('click', () => {
+            closeWater(wave, waterContent, wrapper, waveUnderlay);
+        });
+    }
+
+    function openWater() {
+        wave.classList.add('water-open');
+        if (waveUnderlay) {
+            waveUnderlay.classList.add('water-open');
+        }
+        waterContent.setAttribute('aria-hidden', 'false');
+        if (wrapper) {
+            wrapper.classList.add('water-open');
+        }
+        waterContent.focus({ preventScroll: true });
+    }
+
+    function setUnderlayContent(text) {
+        if (!underlayTitle || !underlayContent || !underlayPanelBody) {
+            return;
+        }
+
+        const currentText = (underlayTitle.textContent || '').trim();
+        const isInitialFill = currentText === '';
+
+        if (isInitialFill) {
+            applyContent(text);
+            return;
+        }
+
+        if (currentText === text || isPanelAnimating) {
+            return;
+        }
+
+        isPanelAnimating = true;
+        underlayPanelBody.classList.add('slide-out-left');
+
+        const finishSlideOut = () => {
+            underlayPanelBody.classList.remove('slide-out-left');
+            applyContent(text);
+            underlayPanelBody.classList.add('prep-in');
+
+            requestAnimationFrame(() => {
+                // force layout so prep-in start position is applied before animating back to center
+                underlayPanelBody.getBoundingClientRect();
+                underlayPanelBody.classList.remove('prep-in');
+                const handleSlideInEnd = (evt) => {
+                    if (evt.target !== underlayPanelBody || evt.propertyName !== 'transform') {
+                        return;
+                    }
+                    underlayPanelBody.removeEventListener('transitionend', handleSlideInEnd);
+                    isPanelAnimating = false;
+                };
+                underlayPanelBody.addEventListener('transitionend', handleSlideInEnd, { once: true });
+
+                // Fallback in case transitionend does not fire
+                setTimeout(() => {
+                    if (isPanelAnimating) {
+                        isPanelAnimating = false;
+                    }
+                }, 700);
+            });
+        };
+
+        const handleSlideOutEnd = (event) => {
+            if (event.target !== underlayPanelBody || event.propertyName !== 'transform') {
+                return;
+            }
+            underlayPanelBody.removeEventListener('transitionend', handleSlideOutEnd);
+            finishSlideOut();
+        };
+
+        underlayPanelBody.addEventListener('transitionend', handleSlideOutEnd);
+        // Fallback if transitionend doesn't fire (e.g., element not yet visible)
+        setTimeout(() => {
+            if (isPanelAnimating && underlayPanelBody.classList.contains('slide-out-left')) {
+                underlayPanelBody.removeEventListener('transitionend', handleSlideOutEnd);
+                finishSlideOut();
+            }
+        }, 400);
+    }
+
+    function applyContent(text) {
+        underlayTitle.textContent = text;
+        if (text.toLowerCase() === 'rsvp') {
+            loadRsvpContent();
+            return;
+        }
+        if (text.toLowerCase() === 'schedule') {
+            renderScheduleContent();
+            return;
+        }
+        if (text.toLowerCase() === 'faqs') {
+            renderFaqContent();
+            return;
+        }
+        if (text.toLowerCase() === 'challenge') {
+            renderChallengeContent();
+            return;
+        }
+        if (text.toLowerCase().includes('travel')) {
+            renderTravelContent();
+            return;
+        }
+
+        const container = ensurePanelContainer();
+        if (container) {
+            container.textContent = text;
+        }
+    }
+
+    function renderScheduleContent() {
+        const container = ensurePanelContainer();
+        if (!container) {
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="schedule-panel">
+                <ol class="schedule-timeline">
+                    <li class="schedule-item">
+                        <div class="schedule-time">14:15</div>
+                        <div class="schedule-body">
+                            <p class="schedule-heading">Ceremony</p>
+                            <a class="schedule-link" href="https://maps.google.com/?q=Bristol%20Register%20Office" target="_blank" rel="noopener">Bristol Register Office</a>
+                            <p class="schedule-text">Please arrive promptly to be seated by 14:30</p>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <div class="schedule-time">15:15</div>
+                        <div class="schedule-body">
+                            <p class="schedule-heading">Cocktail Parade</p>
+                            <p class="schedule-text">Leaving from <a class="schedule-link" href="https://maps.google.com/?q=Bristol%20Register%20Office" target="_blank" rel="noopener">Bristol Register Office</a></p>
+                            <p class="schedule-text">Led by New Orleans brass band <a href="https://headrushbrassband.com">Head Rush</a></p>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <div class="schedule-time">15:45</div>
+                        <div class="schedule-body">
+                            <p class="schedule-heading">Harbour Cruise</p>
+                            <p class="schedule-text">Departing from <a class="schedule-link" href="https://maps.app.goo.gl/XmeXfENA1zp47vE88" target="_blank" rel="noopener">Castle Park Landing</a></p>
+                            <p class="schedule-text">Drinks, snacks, and a scenic cruise along the River Avon</p>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <div class="schedule-time">18:00</div>
+                        <div class="schedule-body">
+                            <p class="schedule-heading">Wedding Breakfast</p>
+                            <p class="schedule-text">Docking at <a class="schedule-link" href="https://maps.app.goo.gl/w7dXcijqcsYg6aJT9" target="_blank" rel="noopener">Riverstation</a></p>
+                            <p class="schedule-text">A three-course meal to celebrate the newlyweds</p>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <div class="schedule-time">20:30</div>
+                        <div class="schedule-body">
+                            <p class="schedule-heading">Evening</p>
+                            <a class="schedule-link" href="https://maps.app.goo.gl/w7dXcijqcsYg6aJT9" target="_blank" rel="noopener">Riverstation</a>
+                            <p class="schedule-text">The celebration continues with dancing and drinks</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        `;
+    }
+
+    function renderFaqContent() {
+        const container = ensurePanelContainer();
+        if (!container) {
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="faq-panel">
+                <div class="faq-item">
+                    <p class="faq-question">What time should I arrive?</p>
+                    <p class="faq-answer">If you're attending the ceremony, please arrive between 14:15 and 14:30 so you can get settled before we begin.</p>
+                    <p class="faq-answer">If you're joining us later in the day, please check the schedule for timings and locations.</p>
+                    <p class="faq-answer">Evening guests are welcome from 20:30 — we can't wait to celebrate with you!</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">How do I RSVP?</p>
+                    <p class="faq-answer">Please let us know whether you can join us via the RSVP page — it really helps us with our planning.</p>
+                    <p class="faq-answer">When you reply, please include any dietary requirements so we can make sure everyone is well catered for.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">Can I bring a plus one or children?</p>
+                    <p class="faq-answer">Due to limited venue capacity, we're only able to accommodate plus ones during the day if they're named on your invitation.</p>
+                    <p class="faq-answer">If you'd like to bring a guest in the evening, they're very welcome to join from 20:30 onwards — just let Luke or Kayleigh know.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">What date should I RSVP by?</p>
+                    <p class="faq-answer">We'd love to hear from you as soon as you can, but please RSVP by April 30th so we can finalise arrangements for our big day (evening guests may RSVP by May 31st).</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">Will the wedding be inside or outside?</p>
+                    <p class="faq-answer">The ceremony and evening reception will take place indoors.</p>
+                    <p class="faq-answer">However, the cocktail parade and harbour cruise will be outside — so we're hoping for sunshine!</p>
+                </div>
+                            
+                <div class="faq-item">
+                    <p class="faq-question">What do I wear?</p>
+                    <p class="faq-answer">Please join us in formal attire — we'd love to see everyone dressed their best for the occasion!</p>
+                    <p class="faq-answer">Think suits, ties, dresses, and anything fabulous!</p>
+                    <p class="faq-answer">As there will be some walking and outdoor elements during the day, we recommend comfortable (but still dressy) shoes and bringing a light layer, just in case the British weather has its own plans.</p>
+                    <p class="faq-answer">We also kindly ask that guests avoid wearing white.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">Do you have a wedding registry?</p>
+                    <p class="faq-answer">Yes! We've created a registry with <a href="https://prezola.com/buy/view/273933" target="_blank" rel="noopener">Prezola</a> for guests who would like to contribute towards our honeymoon.</p>
+                    <p class="faq-answer">Your presence at our wedding truly means more to us than any gift, and anything you give is completely optional.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">Can I take photos?</p>
+                    <p class="faq-answer">We'd love you to take photos throughout the day and share them with us — we can't wait to see them!</p>
+                    <p class="faq-answer">We just ask that no photos are taken during the ceremony.</p>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderChallengeContent() {
+        if (!underlayContent) {
+            return;
+        }
+
+        const container = ensurePanelContainer();
+        if (container) {
+            container.textContent = 'Coming soon!';
+        }
+    }
+
+    function renderTravelContent() {
+        const container = ensurePanelContainer();
+        if (!container) {
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="travel-panel">
+                <div class="travel-section">
+                    <p class="travel-heading">Hotels</p>
+                    <div class="hotel-list">
+                        <div class="hotel-card">
+                            <p class="hotel-name">Hort's Townhouse</p>
+                            <p class="hotel-address">49 Broad St, Bristol BS1 2EP</p>
+                            <a class="hotel-link" href="https://hortstownhousebristol.co.uk" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">The Bristol Hotel</p>
+                            <p class="hotel-address">Prince St, Bristol BS1 4QF</p>
+                            <a class="hotel-link" href="https://www.doylecollection.com/hotels/the-bristol-hotel" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Bristol Royal Marriott</p>
+                            <p class="hotel-address">College Green, Bristol BS1 5TA</p>
+                            <a class="hotel-link" href="https://www.marriott.com/en-us/hotels/brsry-bristol-marriott-royal-hotel" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Harbour Hotel</p>
+                            <p class="hotel-address">53-55 Corn St, Bristol BS1 1HT</p>
+                            <a class="hotel-link" href="https://www.harbourhotels.co.uk/our-hotels/bristol/harbour-hotel-bristol" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Claton Hotel</p>
+                            <p class="hotel-address">35, 37 Broad St, Bristol BS1 2EQ</p>
+                            <a class="hotel-link" href="https://www.claytonhotels.com/bristol-city/" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Premier Inn (King Street)</p>
+                            <p class="hotel-address">Llandoger Trow, King St, Bristol BS1 4ER</p>
+                            <a class="hotel-link" href="https://www.premierinn.com/gb/en/hotels/england/bristol/bristol/bristol-city-centre-king-street.html" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Delta Hotels Bristol City Centre</p>
+                            <p class="hotel-address">2 Lower Castle St, Bristol BS1 3AD</p>
+                            <a class="hotel-link" href="https://www.marriott.com/en-us/hotels/brsde-delta-hotels-bristol-city-centre/overview/" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">Novotel Bristol Centre</p>
+                            <p class="hotel-address">Victoria St, Redcliffe, Bristol BS1 6HY</p>
+                            <a class="hotel-link" href="https://all.accor.com/hotel/5622/index.en.shtml" target="_blank" rel="noopener">Book on their website</a>
+                        </div>
+            
+                    </div>
+                </div>
+                <div class="travel-section">
+                    <p class="travel-heading">Travel</p>
+                    <div class="hotel-list">
+                        <div class="hotel-card">
+                            <p class="hotel-name">Bristol Temple Meads Train Station</p>
+                            <p class="hotel-address">Redcliffe, Bristol BS1 6QF</p>
+                            <p class="hotel-address">15 minute walk from Bristol Register Office</p>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">NCP Bristol Nelson Street</p>
+                            <p class="hotel-address">Nelson St, Bristol BS1 3DB</p>
+                            <a class="hotel-link" href="https://www.ncp.co.uk/find-a-car-park/car-parks/bristol-nelson-street" target="_blank" rel="noopener">Car park website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">NCP Baldwin Street</p>
+                            <p class="hotel-address">40 Baldwin St, Bristol BS1 1NR</p>
+                            <a class="hotel-link" href="https://www.ncp.co.uk/find-a-car-park/car-parks/bristol-baldwin-street" target="_blank" rel="noopener">Car park website</a>
+                        </div>
+
+                        <div class="hotel-card">
+                            <p class="hotel-name">The Grove Long Stay</p>
+                            <p class="hotel-address">40 The Grove, Bristol BS1 4RB</p>
+                            <a class="hotel-link" href="https://www.bristol.gov.uk/residents/parking/where-to-park-in-bristol/the-grove-long-stay-car-parkt" target="_blank" rel="noopener">Car park website</a>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    const STARTER_OPTIONS = [
+        { value: 'starter_terrine', label: 'Ham hock terrine, sauce gribiche, house pickles' },
+        { value: 'starter_salmon', label: 'Cured Loch Duart salmon, chilli, citrus' },
+        { value: 'starter_celeriac', label: 'Salt-baked celeriac, walnut, misocrème fraîche, leaves' },
+    ];
+
+    const MAIN_OPTIONS = [
+        { value: 'main_ox_cheek', label: 'Aberdeen Angus ox cheek, mustard mash, seasonal veg' },
+        { value: 'main_fish_of_the_day', label: 'Market fish of the day, new potatoes, seasonal veg' },
+        { value: 'main_gnocchi', label: 'Gnocchi, courgette, aged parmesan' },
+    ];
+
+    const DESSERT_OPTIONS = [
+        { value: 'dessert_chocolate_mousse', label: 'Dark chocolate mousse, seasonal fruit' },
+        { value: 'dessert_lemon_posset', label: 'Lemon posset, oat crumble' },
+        { value: 'dessert_rice_pudding', label: 'Coconut rice pudding, seasonal berries' },
+    ];
+
+    async function loadRsvpContent() {
+        const container = ensurePanelContainer();
+        if (!container) {
+            return;
+        }
+
+        const requestId = Date.now();
+        activeRsvpRequestId = requestId;
+        showRsvpLoadingState();
+
+        const weddingPin = getWeddingPin();
+        if (!weddingPin || typeof db === 'undefined') {
+            renderRsvpError('We could not load your invite. Please log in again.');
+            return;
+        }
+
+        try {
+            const guests = await loadGuestsForWeddingPin(weddingPin);
+            if (activeRsvpRequestId !== requestId) {
+                return;
+            }
+
+            renderRsvpForms(guests, weddingPin);
+        } catch (error) {
+            console.error('Failed to load RSVP content', error);
+            if (activeRsvpRequestId === requestId) {
+                renderRsvpError('We could not load your invite right now. Please try again.');
+            }
+        }
+    }
+
+    function getWeddingPin() {
+        if (typeof auth === 'undefined') {
+            return '';
+        }
+
+        const user = auth.currentUser;
+        if (user?.email) {
+            return user.email.split('@')[0];
+        }
+
+        return '';
+    }
+
+    async function loadGuestsForWeddingPin(weddingPin) {
+        if (!weddingPin || typeof db === 'undefined') {
+            throw new Error('Missing invite details');
+        }
+
+        const partyDoc = await db.collection('users').doc(weddingPin).get();
+        if (!partyDoc.exists) {
+            throw new Error('Invite not found');
+        }
+
+        const partyData = partyDoc.data() || {};
+        const guestRefs = Array.isArray(partyData.guests) ? partyData.guests : [];
+        const guestSnapshots = await Promise.all(
+            guestRefs.map((ref) => ref.get().catch(() => null))
+        );
+
+        return guestSnapshots
+            .filter((snap) => snap && snap.exists)
+            .map((snap) => ({ id: snap.id, data: snap.data() || {} }));
+    }
+
+    async function updateChallengeNavVisibility(user) {
+        if (!challengeLink) {
+            return;
+        }
+
+        if (!user?.email) {
+            challengeLink.hidden = false;
+            return;
+        }
+
+        try {
+            const weddingPin = user.email.split('@')[0];
+            const guests = await loadGuestsForWeddingPin(weddingPin);
+            const isEveningOnlyParty = guests.length > 0 && guests.every((guest) => (
+                isEveningOnlyGuest(normalizeAttendanceMap(guest.data?.attendance))
+            ));
+
+            challengeLink.hidden = isEveningOnlyParty;
+        } catch (error) {
+            console.error('Failed to update challenge nav visibility', error);
+            challengeLink.hidden = false;
+        }
+    }
+
+    function formatGuestName(data) {
+        const first = (data.first_name || '').trim();
+        const last = (data.last_name || '').trim();
+        const fullName = `${first} ${last}`.trim();
+
+        if (fullName) {
+            return fullName;
+        }
+
+        if (first || last) {
+            return first || last;
+        }
+
+        if (data.email) {
+            return data.email;
+        }
+
+        return '';
+    }
+
+    function renderRsvpForms(guests, weddingPin) {
+        const container = ensurePanelContainer();
+        if (!container) {
+            return;
+        }
+
+        container.innerHTML = '';
+
+        if (!guests || guests.length === 0) {
+            renderRsvpError('We could not find any guests for this invite.');
+            return;
+        }
+
+        if (isRsvpClosedForParty(guests, weddingPin)) {
+            renderClosedRsvpMessage();
+            return;
+        }
+
+        const rsvpQuestions = getRsvpQuestions();
+        const formContainer = document.createElement('div');
+        formContainer.className = 'rsvp-forms';
+
+        guests.forEach((guest, index) => {
+            const data = guest.data || {};
+            const guestName = formatGuestName(data);
+            const headerLabel = (data.first_name || '').trim() || `Guest ${index + 1}`;
+            const attendanceValues = normalizeAttendanceMap(data.attendance);
+            const hasSubmitted = data.submitted_form === true;
+            const fieldsId = `rsvp-fields-${index}`;
+
+            const form = document.createElement('form');
+            form.className = 'underlay-form rsvp-guest-card';
+            form.classList.add('collapsed');
+            form.setAttribute('aria-label', `RSVP form for ${guestName || `Guest ${index + 1}`}`);
+
+            const header = document.createElement('div');
+            header.className = 'rsvp-guest-header';
+
+            const toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'rsvp-guest-toggle';
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-controls', fieldsId);
+
+            const headerName = document.createElement('span');
+            headerName.className = 'rsvp-guest-name';
+            headerName.textContent = headerLabel;
+
+            const toggleIcon = document.createElement('span');
+            toggleIcon.className = 'rsvp-guest-toggle-icon';
+            toggleIcon.textContent = '▾';
+
+            let statusIcon = null;
+            if (hasSubmitted) {
+                statusIcon = document.createElement('span');
+                statusIcon.className = 'rsvp-status-icon submitted';
+                statusIcon.textContent = '✓';
+                statusIcon.setAttribute('aria-label', 'Submitted');
+                statusIcon.setAttribute('title', 'Submitted');
+            }
+
+            toggle.appendChild(headerName);
+            if (statusIcon) {
+                const spacer = document.createElement('span');
+                spacer.style.flex = '0 0 1vh';
+                toggle.appendChild(spacer);
+                toggle.appendChild(statusIcon);
+            }
+            toggle.appendChild(toggleIcon);
+
+            header.appendChild(toggle);
+            form.appendChild(header);
+
+            const fields = document.createElement('div');
+            fields.className = 'rsvp-guest-fields';
+            fields.id = fieldsId;
+            fields.style.maxHeight = '0px';
+
+            const nameSection = document.createElement('div');
+            nameSection.className = 'rsvp-section';
+
+            const firstNameInput = buildInputField({
+                id: `rsvp-first-name-${index}`,
+                name: `first_name-${guest.id || index}`,
+                label: 'First Name',
+                placeholder: 'First name',
+                type: 'text',
+                value: (data.first_name || '').trim()
+            });
+            nameSection.appendChild(firstNameInput.wrapper);
+
+            const lastNameInput = buildInputField({
+                id: `rsvp-last-name-${index}`,
+                name: `last_name-${guest.id || index}`,
+                label: 'Last Name',
+                placeholder: 'Last name',
+                type: 'text',
+                value: (data.last_name || '').trim()
+            });
+            nameSection.appendChild(lastNameInput.wrapper);
+
+            const emailInput = buildInputField({
+                id: `rsvp-email-${index}`,
+                name: `email-${guest.id || index}`,
+                label: 'Email Address',
+                placeholder: 'you@example.com',
+                type: 'email',
+                value: (data.email || '').trim()
+            });
+            nameSection.appendChild(emailInput.wrapper);
+
+            const phoneInput = buildInputField({
+                id: `rsvp-phone-${index}`,
+                name: `phone-${guest.id || index}`,
+                label: 'Phone Number',
+                placeholder: 'Contact number',
+                type: 'tel',
+                value: (data.phone_number || '').trim()
+            });
+            nameSection.appendChild(phoneInput.wrapper);
+            fields.appendChild(nameSection);
+
+            const attendanceSection = document.createElement('div');
+            attendanceSection.className = 'rsvp-section';
+            const attendanceField = buildCheckboxGroup({
+                id: `rsvp-attendance-${index}`,
+                name: `attendance-${guest.id || index}`,
+                legend: 'Attendance',
+                options: getOrderedAttendanceKeys(attendanceValues).map((key) => ({
+                    value: key,
+                    label: formatAttendanceLabel(key)
+                })),
+                values: attendanceValues
+            });
+            const attendanceCheckboxes = Array.from(attendanceField.querySelectorAll('input[type="checkbox"]'));
+            attendanceSection.appendChild(attendanceField);
+            fields.appendChild(attendanceSection);
+
+            const mealSection = buildMealSelectionSection({
+                index,
+                guestId: guest.id || index,
+                data
+            });
+            fields.appendChild(mealSection.wrapper);
+
+            const dietarySection = document.createElement('div');
+            dietarySection.className = 'rsvp-section rsvp-dietary-group';
+            const dietaryTextField = buildInputField({
+                id: `rsvp-dietary-${index}`,
+                name: `dietary-${guest.id || index}`,
+                label: 'Dietary preferences, allergies or other dietary needs? (optional)',
+                placeholder: 'e.g. vegan, nut allergy, gluten free',
+                type: 'text',
+                value: buildDietaryText(data)
+            });
+            dietaryTextField.wrapper.classList.add('rsvp-dietary-text');
+            dietarySection.appendChild(dietaryTextField.wrapper);
+            fields.appendChild(dietarySection);
+
+            const questionSection = document.createElement('div');
+            questionSection.className = 'rsvp-section';
+            const questionCaption = document.createElement('p');
+            questionCaption.className = 'rsvp-questions-caption';
+            questionCaption.textContent = 'Please answer at least three of the following questions (but preferably all of them!) – your responses will be part of the evening entertainment.';
+            questionSection.appendChild(questionCaption);
+            const questionInputs = [];
+            rsvpQuestions.forEach((question, qIndex) => {
+                const questionField = buildInputField({
+                    id: `rsvp-question-${qIndex + 1}-${index}`,
+                    name: `${question.key}-${guest.id || index}`,
+                    label: question.label,
+                    placeholder: question.placeholder || 'Your answer',
+                    type: 'text',
+                    value: (data[question.key] || '').trim()
+                });
+                questionField.wrapper.classList.add('rsvp-question');
+                questionInputs.push({ key: question.key, input: questionField.input });
+                questionSection.appendChild(questionField.wrapper);
+            });
+            fields.appendChild(questionSection);
+
+            const refreshBreakfastSpecificFields = () => {
+                const updatedAttendance = gatherAttendanceValues(attendanceValues, attendanceCheckboxes);
+                setBreakfastSpecificSectionsVisibility({
+                    attendanceValues: updatedAttendance,
+                    mealSection: mealSection.wrapper,
+                    questionSection
+                });
+                syncGuestFieldsHeight(form, fields);
+            };
+            refreshBreakfastSpecificFields();
+            attendanceCheckboxes.forEach((checkbox) => {
+                checkbox.addEventListener('change', refreshBreakfastSpecificFields);
+            });
+
+            const submitButton = document.createElement('button');
+            submitButton.type = 'button';
+            submitButton.textContent = hasSubmitted ? 'Update RSVP' : 'Submit RSVP';
+            submitButton.className = 'rsvp-submit';
+            if (hasSubmitted) {
+                submitButton.classList.add('submitted');
+                form.classList.add('submitted');
+            }
+            submitButton.addEventListener('click', async () => {
+                await saveGuestRsvp({
+                    guestId: guest.id,
+                    attendanceValues,
+                    attendanceCheckboxes,
+                    mealSelections: mealSection.selections,
+                    dietaryTextInput: dietaryTextField.input,
+                    firstNameInput: firstNameInput.input,
+                    lastNameInput: lastNameInput.input,
+                    emailInput: emailInput.input,
+                    phoneInput: phoneInput.input,
+                    questionInputs,
+                    form,
+                    submitButton,
+                    statusIcon,
+                    header,
+                    fields,
+                    toggle,
+                    warningEl
+                });
+            });
+            fields.appendChild(submitButton);
+
+            const warningEl = document.createElement('p');
+            warningEl.className = 'rsvp-warning';
+            warningEl.setAttribute('role', 'alert');
+            warningEl.textContent = '';
+            fields.appendChild(warningEl);
+
+            form.appendChild(fields);
+
+            toggle.addEventListener('click', () => {
+                const isCollapsed = form.classList.contains('collapsed');
+                setGuestFieldsExpanded(form, fields, toggle, isCollapsed);
+            });
+
+            formContainer.appendChild(form);
+
+            // ensure collapsed initial state animates cleanly
+            requestAnimationFrame(() => {
+                setGuestFieldsExpanded(form, fields, toggle, false);
+            });
+        });
+
+        container.appendChild(formContainer);
+    }
+
+    function isRsvpClosedForParty(guests, weddingPin) {
+        if (RSVP_OPEN_PIN_EXCEPTIONS.has(String(weddingPin || ''))) {
+            return false;
+        }
+
+        return guests.some((guest) => !isEveningOnlyGuest(normalizeAttendanceMap(guest.data?.attendance)));
+    }
+
+    function isEveningOnlyGuest(attendanceValues) {
+        const attendingEvents = Object.entries(attendanceValues || {})
+            .filter(([, isAttending]) => isAttending)
+            .map(([eventName]) => eventName);
+
+        return attendingEvents.length === 1 && attendingEvents[0] === 'evening';
+    }
+
+    function renderClosedRsvpMessage() {
+        const container = ensurePanelContainer();
+        if (!container) {
+            return;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'underlay-form rsvp-guest-card rsvp-closed-card';
+        card.setAttribute('aria-label', 'RSVP closed');
+
+        const message = document.createElement('p');
+        message.className = 'rsvp-closed-message';
+        message.textContent = 'The RSVP form is closed now, but if you would like to make any changes please reach out to Luke or Kay.';
+
+        card.appendChild(message);
+
+        container.innerHTML = '';
+        container.appendChild(card);
+    }
+
+    function buildDietaryText(data) {
+        const dietary = (data.dietary_requirements || '').trim();
+        return dietary ? dietary : '';
+    }
+
+    function buildInputField({ id, name, label, placeholder, type, value }) {
+        const wrapper = document.createElement('div');
+
+        const input = document.createElement('input');
+        input.id = id;
+        input.name = name;
+        input.type = type;
+        input.placeholder = placeholder;
+        if (value) {
+            input.value = value;
+        }
+
+        const labelEl = buildLabel(label, id);
+        wrapper.appendChild(labelEl);
+        wrapper.appendChild(input);
+
+        return { wrapper, input };
+    }
+
+    function buildSelectField({ id, name, label, options, value }) {
+        const wrapper = document.createElement('div');
+
+        const labelEl = document.createElement('label');
+        labelEl.setAttribute('for', id);
+        labelEl.textContent = label;
+
+        const select = document.createElement('select');
+        select.id = id;
+        select.name = name;
+
+        options.forEach((option) => {
+            const opt = document.createElement('option');
+            opt.value = option.value;
+            opt.textContent = option.label;
+            select.appendChild(opt);
+        });
+
+        if (typeof value === 'string') {
+            select.value = value;
+        }
+
+        wrapper.appendChild(labelEl);
+        wrapper.appendChild(select);
+
+        return wrapper;
+    }
+
+    function buildCheckboxGroup({ id, name, legend, options, values }) {
+        const wrapper = document.createElement('fieldset');
+        wrapper.className = 'rsvp-checkbox-group';
+        wrapper.id = id;
+
+        const legendEl = document.createElement('legend');
+        legendEl.textContent = legend;
+        wrapper.appendChild(legendEl);
+
+        const list = document.createElement('div');
+        list.className = 'rsvp-checkboxes';
+
+        options.forEach((option, idx) => {
+            const optionId = `${id}-${idx}`;
+            const item = document.createElement('div');
+            item.className = 'rsvp-checkbox-item';
+
+            const labelEl = buildLabel(option.label, optionId);
+            labelEl.style.textAlign = 'left';
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.id = optionId;
+            input.name = name;
+            input.value = option.value;
+
+            const isCheckedFromValues = values && Object.prototype.hasOwnProperty.call(values, option.value) ? !!values[option.value] : false;
+            const isCheckedFromOption = option.checked === true;
+            input.checked = isCheckedFromValues || isCheckedFromOption;
+
+            item.appendChild(labelEl);
+            item.appendChild(input);
+            list.appendChild(item);
+        });
+
+        wrapper.appendChild(list);
+        return wrapper;
+    }
+
+    function buildMealSelectionSection({ index, guestId, data }) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'rsvp-section rsvp-meal-group';
+
+        const heading = document.createElement('p');
+        heading.className = 'rsvp-questions-caption';
+        heading.textContent = 'Please choose one starter, one main, and one dessert.';
+        wrapper.appendChild(heading);
+
+        const starterGroup = buildCourseGroup({
+            id: `rsvp-starter-${index}`,
+            legend: 'Starter',
+            options: STARTER_OPTIONS,
+            selectedValue: getExistingCourseSelection(data, STARTER_OPTIONS),
+            guestId
+        });
+
+        const mainGroup = buildCourseGroup({
+            id: `rsvp-main-${index}`,
+            legend: 'Main',
+            options: MAIN_OPTIONS,
+            selectedValue: getExistingCourseSelection(data, MAIN_OPTIONS),
+            guestId
+        });
+
+        const dessertGroup = buildCourseGroup({
+            id: `rsvp-dessert-${index}`,
+            legend: 'Dessert',
+            options: DESSERT_OPTIONS,
+            selectedValue: getExistingCourseSelection(data, DESSERT_OPTIONS),
+            guestId
+        });
+
+        wrapper.appendChild(starterGroup.wrapper);
+        wrapper.appendChild(mainGroup.wrapper);
+        wrapper.appendChild(dessertGroup.wrapper);
+
+        return {
+            wrapper,
+            selections: {
+                starter: starterGroup,
+                main: mainGroup,
+                dessert: dessertGroup
+            }
+        };
+    }
+
+    function buildCourseGroup({ id, legend, options, selectedValue, guestId }) {
+        const wrapper = document.createElement('fieldset');
+        wrapper.className = 'rsvp-checkbox-group rsvp-radio-group';
+        wrapper.id = id;
+
+        const legendEl = document.createElement('legend');
+        legendEl.textContent = legend;
+        wrapper.appendChild(legendEl);
+
+        const list = document.createElement('div');
+        list.className = 'rsvp-checkboxes';
+
+        const radios = [];
+        options.forEach((option, idx) => {
+            const optionId = `${id}-${idx}`;
+            const item = document.createElement('div');
+            item.className = 'rsvp-checkbox-item';
+
+            const labelEl = buildLabel(option.label, optionId);
+            labelEl.style.textAlign = 'left';
+
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.id = optionId;
+            input.name = `${id}-choice-${guestId || 'guest'}`;
+            input.value = option.value;
+            input.checked = option.value === selectedValue;
+
+            item.appendChild(labelEl);
+            item.appendChild(input);
+            list.appendChild(item);
+            radios.push(input);
+        });
+
+        wrapper.appendChild(list);
+
+        return { wrapper, radios };
+    }
+
+    function getExistingCourseSelection(data, options) {
+        if (!data || !options) {
+            return '';
+        }
+        const existingKey = options.find((option) => data[option.value]) || null;
+        return existingKey ? existingKey.value : '';
+    }
+
+    function getSelectedCourseValue(radios) {
+        const selected = Array.from(radios || []).find((radio) => radio.checked);
+        return selected ? selected.value : '';
+    }
+
+    function buildCoursePayload(selectedValue, options) {
+        return (options || []).reduce((acc, option) => {
+            acc[option.value] = option.value === selectedValue;
+            return acc;
+        }, {});
+    }
+
+    function buildLabel(text, forId) {
+        const labelEl = document.createElement('label');
+        labelEl.setAttribute('for', forId);
+        labelEl.textContent = text;
+        return labelEl;
+    }
+
+    function formatAttendanceLabel(key) {
+        return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    function normalizeAttendanceMap(map) {
+        if (!map || typeof map !== 'object') {
+            return {};
+        }
+        return Object.keys(map).reduce((acc, key) => {
+            acc[key] = !!map[key];
+            return acc;
+        }, {});
+    }
+
+    function getRsvpQuestions() {
+        return [
+            { key: 'go_to_karaoke_song', label: 'What\'s your go-to karaoke song?' },
+            { key: 'favourite_movie', label: 'What\'s your favourite movie?' },
+            { key: 'favorite_holiday_destination', label: 'Where is your favourite holiday destination?' },
+            { key: 'name_of_pet', label: 'If you have a pet, what is his/her name?' },
+            { key: 'favourite_dessert', label: 'What\'s your favourite dessert?' },
+        ];
+    }
+
+    function getOrderedAttendanceKeys(attendanceValues) {
+        const order = [
+            'ceremony',
+            'cocktail_parade',
+            'harbour_cruise',
+            'wedding_breakfast',
+            'evening'
+        ];
+        const available = Object.keys(attendanceValues || {});
+        const orderedKeys = order.filter((key) => available.includes(key));
+
+        // include any remaining keys not in the predefined order
+        available.forEach((key) => {
+            if (!orderedKeys.includes(key)) {
+                orderedKeys.push(key);
+            }
+        });
+
+        return orderedKeys;
+    }
+
+    function gatherAttendanceValues(baseValues, checkboxes) {
+        const updated = { ...(baseValues || {}) };
+        checkboxes.forEach((checkbox) => {
+            updated[checkbox.value] = checkbox.checked;
+        });
+        return updated;
+    }
+
+    function isAttendingWeddingBreakfast(attendanceValues) {
+        return !!attendanceValues?.wedding_breakfast;
+    }
+
+    function isAttendingAnyEvent(attendanceValues) {
+        return Object.values(attendanceValues || {}).some(Boolean);
+    }
+
+    function setBreakfastSpecificSectionsVisibility({ attendanceValues, mealSection, questionSection }) {
+        const shouldShow = isAttendingWeddingBreakfast(attendanceValues);
+
+        if (mealSection) {
+            mealSection.style.display = shouldShow ? '' : 'none';
+            mealSection.setAttribute('aria-hidden', String(!shouldShow));
+        }
+
+        if (questionSection) {
+            questionSection.style.display = shouldShow ? '' : 'none';
+            questionSection.setAttribute('aria-hidden', String(!shouldShow));
+        }
+    }
+
+    function validateGuestInputs({
+        firstNameInput,
+        lastNameInput,
+        emailInput,
+        phoneInput,
+        questionInputs,
+        mealSelections,
+        attendanceValues
+    }) {
+        const missing = [];
+        const attendingAnyEvent = isAttendingAnyEvent(attendanceValues);
+
+        if (!firstNameInput?.value.trim()) {
+            missing.push('First Name');
+        }
+
+        if (attendingAnyEvent) {
+            if (!lastNameInput?.value.trim()) {
+                missing.push('Last Name');
+            }
+            if (!emailInput?.value.trim()) {
+                missing.push('Email Address');
+            }
+            if (!phoneInput?.value.trim()) {
+                missing.push('Phone Number');
+            }
+        }
+
+        const attendingWeddingBreakfast = isAttendingWeddingBreakfast(attendanceValues);
+        if (attendingWeddingBreakfast) {
+            if (!getSelectedCourseValue(mealSelections?.starter?.radios)) {
+                missing.push('Starter choice');
+            }
+            if (!getSelectedCourseValue(mealSelections?.main?.radios)) {
+                missing.push('Main course choice');
+            }
+            if (!getSelectedCourseValue(mealSelections?.dessert?.radios)) {
+                missing.push('Dessert choice');
+            }
+        }
+
+        const answeredCount = attendingWeddingBreakfast && Array.isArray(questionInputs)
+            ? questionInputs.filter((entry) => entry?.input?.value.trim()).length
+            : 0;
+
+        const messages = [];
+        if (missing.length > 0) {
+            messages.push(`Complete: ${missing.join(', ')}`);
+        }
+        if (attendingWeddingBreakfast && answeredCount < 3) {
+            messages.push(`Answer at least 3 of the 5 entertainment questions (currently ${answeredCount})`);
+        }
+
+        if (messages.length > 0) {
+            const bulletList = [
+                ...missing.map((item) => `- ${item}`),
+                ...(attendingWeddingBreakfast && answeredCount < 3 ? [`- Answer at least 3 of the 5 entertainment questions (currently ${answeredCount})`] : [])
+            ];
+            return {
+                valid: false,
+                message: `Please complete:\n${bulletList.join('\n')}`
+            };
+        }
+
+        return { valid: true, message: '' };
+    }
+
+    async function saveGuestRsvp({
+        guestId,
+        attendanceValues,
+        attendanceCheckboxes,
+        mealSelections,
+        dietaryTextInput,
+        firstNameInput,
+        lastNameInput,
+        emailInput,
+        phoneInput,
+        questionInputs,
+        form,
+        submitButton,
+        statusIcon,
+        header,
+        fields,
+        toggle,
+        warningEl
+    }) {
+        if (!guestId || typeof db === 'undefined') {
+            return;
+        }
+
+        const originalText = submitButton.textContent;
+        if (warningEl) {
+            warningEl.textContent = '';
+        }
+        submitButton.classList.remove('invalid');
+
+        const updatedAttendance = gatherAttendanceValues(attendanceValues, attendanceCheckboxes);
+
+        const validation = validateGuestInputs({
+            firstNameInput,
+            lastNameInput,
+            emailInput,
+            phoneInput,
+            questionInputs,
+            mealSelections,
+            attendanceValues: updatedAttendance
+        });
+
+        if (!validation.valid) {
+            if (warningEl) {
+                warningEl.textContent = validation.message;
+            }
+            if (fields && form && toggle) {
+                setGuestFieldsExpanded(form, fields, toggle, true);
+                fields.style.maxHeight = `${fields.scrollHeight}px`;
+            }
+            submitButton.classList.add('invalid');
+            return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'Saving...';
+
+        try {
+            const dietaryText = (dietaryTextInput?.value || '').trim();
+            const starterChoice = getSelectedCourseValue(mealSelections?.starter?.radios);
+            const mainChoice = getSelectedCourseValue(mealSelections?.main?.radios);
+            const dessertChoice = getSelectedCourseValue(mealSelections?.dessert?.radios);
+
+            const payload = {
+                first_name: (firstNameInput?.value || '').trim(),
+                last_name: (lastNameInput?.value || '').trim(),
+                email: (emailInput?.value || '').trim(),
+                phone_number: (phoneInput?.value || '').trim(),
+                attendance: updatedAttendance,
+                dietary_requirements: dietaryText,
+                vegan: false,
+                vegetarian: false,
+                submitted_form: true,
+                ...buildCoursePayload(starterChoice, STARTER_OPTIONS),
+                ...buildCoursePayload(mainChoice, MAIN_OPTIONS),
+                ...buildCoursePayload(dessertChoice, DESSERT_OPTIONS),
+            };
+
+            if (Array.isArray(questionInputs)) {
+                questionInputs.forEach((entry) => {
+                    if (entry?.key) {
+                        payload[entry.key] = (entry.input?.value || '').trim();
+                    }
+                });
+            }
+
+            await db.collection('guests').doc(guestId).set(payload, { merge: true });
+            if (warningEl) {
+                warningEl.textContent = '';
+            }
+            markGuestSubmitted(form, submitButton, statusIcon, header, toggle);
+            setGuestFieldsExpanded(form, fields, toggle, false);
+        } catch (error) {
+            console.error('Failed to save RSVP', error);
+            submitButton.textContent = 'Save failed. Retry';
+            submitButton.classList.remove('submitted');
+        } finally {
+            submitButton.disabled = false;
+            if (!submitButton.classList.contains('submitted')) {
+                submitButton.textContent = originalText;
+            }
+        }
+    }
+
+    function markGuestSubmitted(form, submitButton, statusEl, header, toggle) {
+        form.classList.add('submitted');
+        submitButton.textContent = 'Update RSVP';
+        submitButton.classList.add('submitted');
+
+        const existingIcons = toggle
+            ? Array.from(toggle.querySelectorAll('.rsvp-status-icon'))
+            : [];
+        let icon = statusEl || existingIcons[0] || null;
+
+        existingIcons.forEach((existingIcon) => {
+            if (existingIcon !== icon) {
+                existingIcon.remove();
+            }
+        });
+
+        if (!icon && toggle) {
+            icon = document.createElement('span');
+            icon.className = 'rsvp-status-icon submitted';
+            icon.setAttribute('aria-label', 'Submitted');
+            icon.setAttribute('title', 'Submitted');
+            toggle.insertBefore(icon, toggle.querySelector('.rsvp-guest-toggle-icon'));
+        }
+        if (icon) {
+            icon.classList.add('submitted');
+            icon.textContent = '✓';
+        }
+    }
+
+    function setGuestFieldsExpanded(form, fields, toggle, expanded) {
+        form.classList.toggle('collapsed', !expanded);
+        toggle.setAttribute('aria-expanded', String(expanded));
+        if (expanded) {
+            fields.style.display = 'grid';
+            syncGuestFieldsHeight(form, fields);
+        } else {
+            fields.style.maxHeight = '0px';
+            // delay hiding display to allow animation
+            setTimeout(() => {
+                if (form.classList.contains('collapsed')) {
+                    fields.style.display = 'none';
+                }
+            }, 650);
+        }
+    }
+
+    function syncGuestFieldsHeight(form, fields) {
+        if (!form || !fields || form.classList.contains('collapsed')) {
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            fields.style.maxHeight = `${fields.scrollHeight}px`;
+        });
+    }
+
+    function enforceExclusiveCheckboxes(checkboxes) {
+        if (!checkboxes || checkboxes.length === 0) {
+            return;
+        }
+
+        // Ensure only the first checked one remains selected on initial render.
+        const firstChecked = checkboxes.find((cb) => cb.checked);
+        if (firstChecked) {
+            checkboxes.forEach((cb) => {
+                if (cb !== firstChecked) {
+                    cb.checked = false;
+                }
+            });
+        }
+
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', () => {
+                if (!checkbox.checked) {
+                    return;
+                }
+                checkboxes.forEach((cb) => {
+                    if (cb !== checkbox) {
+                        cb.checked = false;
+                    }
+                });
+            });
+        });
+    }
+
+    function renderRsvpError(message) {
+        const container = ensurePanelContainer();
+        if (!container) {
+            return;
+        }
+
+        container.textContent = message;
+    }
+
+    function showRsvpLoadingState() {
+        const container = ensurePanelContainer();
+        if (!container) {
+            return;
+        }
+
+        const loadingForm = document.createElement('form');
+        loadingForm.className = 'underlay-form';
+        loadingForm.setAttribute('aria-label', 'Loading RSVP form');
+
+        const loadingText = document.createElement('p');
+        loadingText.textContent = 'Loading your RSVP...';
+
+        loadingForm.appendChild(loadingText);
+
+        container.innerHTML = '';
+        container.appendChild(loadingForm);
+    }
+
+    function ensurePanelContainer() {
+        if (!underlayContent) {
+            return null;
+        }
+        let container = underlayContent.querySelector('.panel-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'panel-container';
+            // move existing children into the container to preserve current content
+            while (underlayContent.firstChild) {
+                container.appendChild(underlayContent.firstChild);
+            }
+            underlayContent.appendChild(container);
+        }
+        return container;
+    }
+});
+
+function closeWater(wave, waterContent, wrapper, waveUnderlay) {
+    if (wave) {
+        wave.classList.remove('water-open');
+    }
+    if (waveUnderlay) {
+        waveUnderlay.classList.remove('water-open');
+    }
+    if (waterContent) {
+        waterContent.setAttribute('aria-hidden', 'true');
+    }
+    if (wrapper) {
+        wrapper.classList.remove('water-open');
+    }
+}
+
+function closeNavMenu(menu, toggle) {
+    if (!menu || !toggle || !menu.classList.contains('open')) {
+        return;
+    }
+
+    if (typeof closeMenu === 'function') {
+        closeMenu(menu, toggle);
+        return;
+    }
+
+    menu.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Open menu');
+}
