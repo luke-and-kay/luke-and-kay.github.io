@@ -29,6 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (text.toLowerCase() === 'challenge') {
             return;
         }
+        if (text.toLowerCase() === 'photos') {
+            return;
+        }
 
         link.addEventListener('click', (event) => {
             event.preventDefault();

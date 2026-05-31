@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wedding Photos</title>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="scripts/auth.js" defer></script>
+
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bellefair&family=Engagement&family=Lexend:wght@100..900&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet"
+    />
+</head>
+<body class="photos-page">
+    <main class="photos-shell">
+        <section class="photos-panel" aria-live="polite">
+            <div class="photos-media" aria-hidden="true">
+                <div class="photos-print photos-print-large"></div>
+                <div class="photos-print photos-print-small"></div>
+            </div>
+
+            <div class="photos-copy">
+                <p class="photos-kicker">Kayleigh &amp; Luke</p>
+                <h1>Wedding Photos</h1>
+                <p class="photos-status" id="photosStatus">Checking your invite...</p>
+
+                <div class="photos-message-card">
+                    <p class="photos-heading" id="photosHeading">Please wait</p>
+                    <p class="photos-message" id="photosMessage">We are checking whether the photo album is available for your invite.</p>
+                </div>
+
+                <form class="photos-login-form" id="photosLoginForm" hidden>
+                    <label for="photosPin">Wedding PIN</label>
+                    <div class="photos-login-row">
+                        <input
+                            id="photosPin"
+                            name="photosPin"
+                            type="text"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            maxlength="6"
+                            autocomplete="one-time-code"
+                            placeholder="123456"
+                        />
+                        <button id="photosLoginBtn" type="submit">Sign in</button>
+                    </div>
+                    <p class="photos-login-error" id="photosLoginError" role="alert"></p>
+                </form>
+
+                <a class="photos-back" href="index.html">Back to invite</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const PHOTOS_ALBUM_URL = 'https://photos.app.goo.gl/SBBPo6bVdT1S1H8R6';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupPhotosLoginForm();
+
+            if (typeof auth === 'undefined' || typeof db === 'undefined') {
+                showUnavailableMessage();
+                return;
+            }
+
+            auth.onAuthStateChanged(async (user) => {
+                if (!user?.email) {
+                    showLoginMessage();
+                    return;
+                }
+
+                try {
+                    const weddingPin = user.email.split('@')[0];
+                    const guests = await loadGuestsForWeddingPin(weddingPin);
+                    if (isPartyEligibleForPhotos(guests)) {
+                        window.location.replace(PHOTOS_ALBUM_URL);
+                        return;
+                    }
+
+                    showUnavailableMessage();
+                } catch (error) {
+                    console.error('Failed to check photos access', error);
+                    showUnavailableMessage();
+                }
+            });
+        });
+
+        function setupPhotosLoginForm() {
+            const form = document.getElementById('photosLoginForm');
+            const pinInput = document.getElementById('photosPin');
+            const button = document.getElementById('photosLoginBtn');
+            const error = document.getElementById('photosLoginError');
+
+            if (!form || !pinInput || !button) {
+                return;
+            }
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const pin = pinInput.value.trim();
+                if (!/^\d{6}$/.test(pin)) {
+                    if (error) {
+                        error.textContent = 'Please enter your 6-digit wedding PIN.';
+                    }
+                    return;
+                }
+
+                if (error) {
+                    error.textContent = '';
+                }
+                button.disabled = true;
+                button.textContent = 'Signing in...';
+
+                try {
+                    await auth.signInWithEmailAndPassword(`${pin}@lukeandkay.co.uk`, pin);
+                    showCheckingMessage();
+                } catch (loginError) {
+                    if (error) {
+                        error.textContent = 'Invalid wedding PIN.';
+                    }
+                    button.disabled = false;
+                    button.textContent = 'Sign in';
+                }
+            });
+        }
+
+        async function loadGuestsForWeddingPin(weddingPin) {
+            if (!weddingPin || typeof db === 'undefined') {
+                throw new Error('Missing invite details');
+            }
+
+            const partyDoc = await db.collection('users').doc(weddingPin).get();
+            if (!partyDoc.exists) {
+                throw new Error('Invite not found');
+            }
+
+            const partyData = partyDoc.data() || {};
+            const guestRefs = Array.isArray(partyData.guests) ? partyData.guests : [];
+            const guestSnapshots = await Promise.all(
+                guestRefs.map((ref) => ref.get().catch(() => null))
+            );
+
+            return guestSnapshots
+                .filter((snap) => snap && snap.exists)
+                .map((snap) => ({ id: snap.id, data: snap.data() || {} }));
+        }
+
+        function isPartyEligibleForPhotos(guests) {
+            return Array.isArray(guests) && guests.some((guest) => (
+                guest?.data?.submitted_form === true &&
+                isAttendingAnyEvent(normalizeAttendanceMap(guest.data?.attendance))
+            ));
+        }
+
+        function normalizeAttendanceMap(map) {
+            if (!map || typeof map !== 'object') {
+                return {};
+            }
+            return Object.keys(map).reduce((acc, key) => {
+                acc[key] = !!map[key];
+                return acc;
+            }, {});
+        }
+
+        function isAttendingAnyEvent(attendanceValues) {
+            return Object.values(attendanceValues || {}).some(Boolean);
+        }
+
+        function showUnavailableMessage() {
+            hidePhotosLoginForm();
+
+            const status = document.getElementById('photosStatus');
+            const heading = document.getElementById('photosHeading');
+            const message = document.getElementById('photosMessage');
+
+            if (status) {
+                status.textContent = 'This page is only available after an attending RSVP.';
+            }
+            if (heading) {
+                heading.textContent = 'Photos are not available yet';
+            }
+            if (message) {
+                message.textContent = 'Please return to the invite and submit an RSVP for at least one part of the day.';
+            }
+        }
+
+        function showLoginMessage() {
+            const status = document.getElementById('photosStatus');
+            const heading = document.getElementById('photosHeading');
+            const message = document.getElementById('photosMessage');
+            const form = document.getElementById('photosLoginForm');
+            const pinInput = document.getElementById('photosPin');
+            const button = document.getElementById('photosLoginBtn');
+
+            if (status) {
+                status.textContent = 'Sign in with your wedding PIN to continue.';
+            }
+            if (heading) {
+                heading.textContent = 'Enter your wedding PIN';
+            }
+            if (message) {
+                message.textContent = 'The photo album is available to guests who have submitted an attending RSVP.';
+            }
+            if (form) {
+                form.hidden = false;
+            }
+            if (button) {
+                button.disabled = false;
+                button.textContent = 'Sign in';
+            }
+            if (pinInput) {
+                pinInput.focus();
+            }
+        }
+
+        function showCheckingMessage() {
+            hidePhotosLoginForm();
+
+            const status = document.getElementById('photosStatus');
+            const heading = document.getElementById('photosHeading');
+            const message = document.getElementById('photosMessage');
+
+            if (status) {
+                status.textContent = 'Checking your invite...';
+            }
+            if (heading) {
+                heading.textContent = 'Please wait';
+            }
+            if (message) {
+                message.textContent = 'We are checking whether the photo album is available for your invite.';
+            }
+        }
+
+        function hidePhotosLoginForm() {
+            const form = document.getElementById('photosLoginForm');
+            if (form) {
+                form.hidden = true;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -959,6 +959,227 @@ body {
     color: #e878a6;
 }
 
+.photos-page {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    color: white;
+    font-family: 'Bellefair', serif;
+    background:
+        radial-gradient(circle at 18% 16%, rgba(232, 120, 166, 0.42), transparent 34rem),
+        linear-gradient(155deg, #052d40 0%, #0b5775 54%, #e878a6 130%);
+}
+
+.photos-shell {
+    box-sizing: border-box;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: max(1.25rem, env(safe-area-inset-top)) 1rem max(1.25rem, env(safe-area-inset-bottom));
+}
+
+.photos-panel {
+    box-sizing: border-box;
+    width: min(100%, 58rem);
+    min-height: clamp(32rem, 72vh, 42rem);
+    display: grid;
+    grid-template-columns: minmax(16rem, 0.9fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(1.25rem, 5vw, 4rem);
+    padding: clamp(1.1rem, 4vw, 3.25rem);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 0.9rem;
+    background: rgba(3, 34, 49, 0.42);
+    box-shadow: 0 1.2rem 3.5rem rgba(0, 0, 0, 0.22);
+}
+
+.photos-media {
+    position: relative;
+    min-height: 25rem;
+}
+
+.photos-print {
+    position: absolute;
+    box-sizing: border-box;
+    border: 0.85rem solid rgba(255, 255, 255, 0.92);
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)),
+        url("assets/thumbnail.png") center / cover;
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.24);
+}
+
+.photos-print-large {
+    width: min(82%, 20rem);
+    aspect-ratio: 4 / 5;
+    left: 7%;
+    top: 4%;
+    transform: rotate(-5deg);
+}
+
+.photos-print-small {
+    width: min(55%, 13rem);
+    aspect-ratio: 1 / 1;
+    right: 0;
+    bottom: 6%;
+    transform: rotate(7deg);
+    background-position: center bottom;
+}
+
+.photos-copy {
+    display: grid;
+    gap: 1rem;
+}
+
+.photos-kicker {
+    margin: 0;
+    font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.photos-copy h1 {
+    margin: 0;
+    font-family: 'Old Standard TT', serif;
+    font-size: clamp(3rem, 8vw, 5.6rem);
+    line-height: 0.95;
+    letter-spacing: 0;
+}
+
+.photos-status {
+    max-width: 34rem;
+    margin: 0;
+    font-size: clamp(1.1rem, 2.3vw, 1.55rem);
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.photos-message-card {
+    display: grid;
+    gap: 0.35rem;
+    max-width: 34rem;
+    margin-top: 0.4rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 0.6rem;
+    background: rgba(0, 0, 0, 0.18);
+}
+
+.photos-heading {
+    margin: 0;
+    font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+    line-height: 1.2;
+}
+
+.photos-message {
+    margin: 0;
+    font-size: clamp(1rem, 1.9vw, 1.18rem);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.photos-login-form {
+    display: grid;
+    gap: 0.55rem;
+    max-width: 34rem;
+}
+
+.photos-login-form[hidden] {
+    display: none;
+}
+
+.photos-login-form label {
+    font-size: 1rem;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.84);
+}
+
+.photos-login-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.65rem;
+}
+
+.photos-login-row input,
+.photos-login-row button {
+    box-sizing: border-box;
+    min-height: 3rem;
+    border-radius: 0.6rem;
+    font-family: 'Lexend', Arial, sans-serif;
+    font-size: 1rem;
+}
+
+.photos-login-row input {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.44);
+    padding: 0.7rem 0.85rem;
+    background: rgba(255, 255, 255, 0.92);
+    color: #054D6A;
+    letter-spacing: 0.14em;
+}
+
+.photos-login-row input:focus {
+    outline: none;
+    border-color: white;
+    box-shadow: 0 0 0 0.18rem rgba(255, 255, 255, 0.22);
+}
+
+.photos-login-row button {
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    padding: 0.7rem 1rem;
+    background: #06445e;
+    color: white;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.photos-login-row button:hover {
+    background: #05384c;
+}
+
+.photos-login-row button:disabled {
+    cursor: default;
+    opacity: 0.7;
+}
+
+.photos-login-error {
+    min-height: 1.25rem;
+    margin: 0;
+    color: #ffd7d7;
+    font-size: 0.95rem;
+    line-height: 1.25;
+}
+
+.photos-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: start;
+    min-height: 2.75rem;
+    box-sizing: border-box;
+    margin-top: 0.25rem;
+    padding: 0.75rem 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    border-radius: 999px;
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    line-height: 1.2;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.photos-back:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.85);
+}
+
 .challenge-page {
     display: block;
     width: 100%;
@@ -1277,6 +1498,65 @@ body {
 }
 
 @media (max-width: 768px) {
+    .photos-shell {
+        place-items: stretch;
+        align-items: center;
+        padding: max(0.85rem, env(safe-area-inset-top)) 0.85rem max(1rem, env(safe-area-inset-bottom));
+    }
+
+    .photos-panel {
+        min-height: auto;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        padding: 1rem;
+        border-radius: 0.75rem;
+    }
+
+    .photos-media {
+        min-height: clamp(12rem, 42vh, 18rem);
+        order: -1;
+    }
+
+    .photos-print {
+        border-width: 0.55rem;
+    }
+
+    .photos-print-large {
+        width: min(70%, 13rem);
+        left: 7%;
+        top: 3%;
+    }
+
+    .photos-print-small {
+        width: min(43%, 8.5rem);
+        right: 8%;
+        bottom: 3%;
+    }
+
+    .photos-copy {
+        gap: 0.85rem;
+    }
+
+    .photos-copy h1 {
+        max-width: 9ch;
+    }
+
+    .photos-message-card {
+        padding: 0.9rem;
+    }
+
+    .photos-login-row {
+        grid-template-columns: 1fr;
+    }
+
+    .photos-login-row button {
+        width: 100%;
+    }
+
+    .photos-back {
+        justify-self: stretch;
+    }
+
     .challenge-page .schedule-title {
         width: 100%;
         text-align: center;
